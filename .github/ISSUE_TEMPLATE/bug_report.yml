@@ -1,0 +1,72 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill out the form below.
+
+  - type: dropdown
+    id: client
+    attributes:
+      label: MCP Client
+      description: Which AI client are you using?
+      options:
+        - Claude (claude.ai)
+        - Claude Desktop
+        - ChatGPT
+        - Cursor
+        - Other (specify below)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: collection-type
+    attributes:
+      label: Collection Type
+      description: What type of collection is involved?
+      options:
+        - Git repository
+        - Google Drive
+        - Not applicable
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the bug clearly.
+      placeholder: "When I ran `my-project.grep('TODO')`, I got an error instead of search results."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+      description: What should have happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: dsl-command
+    attributes:
+      label: DSL command (if applicable)
+      description: Paste the exact command you ran.
+      render: text
+
+  - type: textarea
+    id: error-output
+    attributes:
+      label: Error output
+      description: Paste any error message you received.
+      render: text
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Anything else that might help — screenshots, steps to reproduce, etc.
