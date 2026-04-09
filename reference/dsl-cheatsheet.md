@@ -190,11 +190,18 @@ new content that mentions @@@@@ delimiters
 | `restore()` | Discard all drafts | `my-project.restore()` |
 | `draft.discard()` | Discard one file's draft | `my-project[file.go].draft.discard()` |
 
-## CI / Testing
+## Testing
+
+`test()` runs against your **draft content** — no commit needed. Test before you commit, not after.
 
 ```
-my-project.test(targets="my-component")      # Run targeted tests
-ci["run-ID"].ls()                            # Check test results
+my-project.test(targets="my-component")      # Run tests on current drafts
+```
+
+`test()` returns immediately with a run ID. Wait for the run to complete, then check results:
+
+```
+ci["run-ID"].ls()                            # List test run outputs
 ci["run-ID"].grep("FAIL", context_lines=3)   # Find failures
 ```
 

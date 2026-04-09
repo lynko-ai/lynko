@@ -33,20 +33,19 @@ Your collections appear in the Collections panel once synced.
 
 ## 3. Connect Your AI Client
 
-Add a custom MCP connector in your AI client:
+Add a custom MCP connector in your AI client with this URL:
 
 **URL:** `https://mcp.lynko.ai/`
 
-**Claude Desktop / Claude.ai:**
-- Open settings → MCP connectors → Add custom connector
-- Enter the URL above
-- Under Advanced Settings, set:
-  - Client ID: `claude-browser`
-  - Client Secret: `claude_browser_secret`
+**Most MCP clients (ChatGPT, Codex, etc.):** just the URL is enough. These clients handle registration automatically.
 
-These are public client identifiers required by Claude's OAuth flow, not private credentials. Your account security relies on the OAuth login, not these values.
+**Claude Desktop / Claude.ai:** Claude requires a Client ID and Client Secret because it doesn't support automatic registration. Under Advanced Settings, set:
+- Client ID: `claude-browser`
+- Client Secret: `claude_browser_secret`
 
-**Other MCP clients:** Most only need the URL. The OAuth flow handles authentication. Tested with Claude Desktop and Claude.ai. Other MCP-compatible clients should work — [let us know](../../issues/new/choose) if you hit issues.
+These are public client identifiers for the OAuth flow, not private credentials. Your account security relies on the OAuth login, not these values.
+
+Tested with Claude Desktop, Claude.ai, and ChatGPT. Other MCP-compatible clients should work — [let us know](../../issues/new/choose) if you hit issues.
 
 Once connected, your agent has access to all collections in your workspace.
 

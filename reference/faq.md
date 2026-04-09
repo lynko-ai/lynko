@@ -28,6 +28,9 @@ The old text must match exactly, including whitespace. Use `grep()` or `lines()`
 **What does `@@@@@` mean?**
 It's a raw string delimiter. Content between `@@@@@` markers is passed through literally with no escaping needed. Use it for multi-line code edits. The opening and closing `@@@@@` must each be on their own line.
 
+**Do I need to commit before running tests?**
+No. `test()` runs against your current draft content. Test first, commit after tests pass.
+
 **Do I need to push after committing?**
 No. `commit()` handles both commit and push in one operation.
 

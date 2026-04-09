@@ -121,7 +121,7 @@ my-project[src/server.go].diff()          # Full diff for one file
 
 ## Testing
 
-Run CI against your draft changes (no commit needed):
+Run tests against your **draft content** — no commit needed. Always test before committing:
 
 ```
 my-project.test(targets="my-component")      # Targeted test run
