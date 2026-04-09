@@ -28,15 +28,16 @@ my-project[docs/guide.md].toc()              # Table of contents
 my-project[docs/guide.md].section("Setup")   # Read just one section
 ```
 
-**Edit through conversation:**
+**Edit where you navigate:** the same operation that reads content also defines the edit scope.
 
 ```
-my-project[src/config.go].draft.edit("debug: true", "debug: false")
-my-project.diff()                            # Review changes
-my-project.commit("fix: disable debug mode") # Commit and push
+my-project[src/server.go].expand("Handler").draft.edit("old", "new")   # Scoped to one function
+my-project[docs/guide.md].section("Setup").draft.edit("old", "new")    # Scoped to one section
+my-project.diff()                                                       # Review changes
+my-project.commit("fix: update handler and docs")                       # Commit and push
 ```
 
-**Smart resolution:** paths resolve automatically. `my-project[handler.go]` finds `src/internal/handler.go` if unique. `section("setup")` matches "Setup Guide". You can even skip the collection name — `src/main.go` resolves to the right collection automatically if the file is unambiguous across your workspace.
+**Smart resolution:** paths resolve automatically. `my-project[handler.go]` finds `src/internal/handler.go` if unique. `section("setup")` matches "Setup Guide". You can even skip the collection name — a bare path like `src/main.go` resolves to the right collection and runs your operation, as long as the file is unambiguous across your workspace.
 
 Filesystem operations (`ls`, `grep`, `find`) and scoped search (`my-project[src/].grep("pattern")`) work as you'd expect. See the [DSL cheatsheet](reference/dsl-cheatsheet.md) for the full reference.
 
@@ -66,7 +67,7 @@ Lynko ships skills that follow the [Agent Skills](https://agentskills.io) open s
 |-------|-------------|
 | [explore](skills/explore/) | Browsing repos, reading docs, searching code |
 | [develop](skills/develop/) | Full development workflow: read, edit, test, commit |
-| [write](skills/write/) | Drafting and editing content |
+| [edit](skills/edit/) | Editing content: scoped edits, replacements, new files |
 | [review](skills/review/) | Reviewing changes, reading diffs |
 
 See [skills/README.md](skills/README.md) for installation instructions.

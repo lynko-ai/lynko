@@ -30,6 +30,14 @@ my-project[docs/guide.md].lines("10-30")  # Read specific lines
 my-project[docs/guide.md].read()          # Full file (last resort for small files)
 ```
 
+When sections share common titles, use ` > ` to disambiguate:
+
+```
+my-project[paper.md].section("Methods > Data Collection")  # Specific subsection
+```
+
+Intermediate levels can be skipped — partial paths resolve if unique.
+
 ## Reading Code
 
 Use structure-aware navigation instead of reading entire source files:

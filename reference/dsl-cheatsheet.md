@@ -71,6 +71,15 @@ If a path uniquely identifies a file across all collections in the pod, you don'
 | `lines(spec)` | Specific line range | `my-project[main.go].lines("10-30")` |
 | `pages(spec)` | PDF page range | `my-project[doc.pdf].pages("1-3")` |
 
+**Hierarchical section paths:** when sections share common titles (like "Introduction" in multiple chapters), use ` > ` to disambiguate:
+
+```
+my-project[paper.md].section("Neural Networks > Estimation Error")
+my-project[docs/api.md].section("API Design > Error Handling")
+```
+
+Intermediate levels can be skipped — `section("Neural Networks > Estimation Error")` resolves even without naming every parent.
+
 ## Searching
 
 | Operation | What it does | Example |
@@ -106,6 +115,7 @@ Scope provides defaults — explicit arguments override. For example, `my-projec
 | Operation | When to use | Example |
 |-----------|-------------|---------|
 | `draft.edit(old, new)` | Know *what* to change | `draft.edit("old text", "new text")` |
+| `draft.edit(old, new, all=true)` | Replace *all* occurrences | `draft.edit("TODO", "DONE", all=true)` |
 | `lines(N).draft.replace(new)` | Know *where* to change | `lines("42").draft.replace("new content")` |
 | `draft.append(content)` | Add to end of file | `draft.append("\n\n## New Section")` |
 | `draft(content)` | Create new file | `my-project[new.md].draft("# Title")` |
@@ -119,6 +129,17 @@ my-project[file.go].expand("Handler").draft.edit("old", "new")
 my-project[guide.md].section("Setup").draft.edit("old", "new")
 my-project[file.go].lines("10-20").draft.edit("old", "new")
 ```
+
+**Which operations support edit scoping:**
+
+- ✅ `section()`, `expand()`, `lines()` — continuous source regions
+- ❌ `toc()`, `outline()`, `grep()` — derived views, not editable scopes
+
+`replace()` is lines-only — `section().draft.replace()` and `expand().draft.replace()` are not supported.
+
+**No recursive scoping:** `section(...).lines(...).draft.edit(...)` is not supported. Use one scope level per edit.
+
+**Batched edits:** consecutive `draft.edit()` or `draft.replace()` calls on the same file in one multi-command call auto-batch with snapshot semantics — all line numbers resolve against the original content.
 
 **Raw strings** (no escaping needed for multi-line):
 
