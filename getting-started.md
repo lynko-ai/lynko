@@ -136,6 +136,7 @@ my-project.restore()                         # Discard all drafts
 - **Navigate before reading** — use `toc()`, `outline()`, and `ls()` to find what you need before loading full content. This keeps context usage minimal.
 - **Scope your searches** — `my-project[src/].grep("pattern")` is faster and more relevant than searching the entire repo.
 - **Check status first** — run `status()` at the start of a session to see if there are pending drafts from a previous session.
+- **Use partial paths** — `my-project["handler.go"]` auto-resolves to `src/internal/handler.go` if the filename is unique.
 
 ## Next Steps
 

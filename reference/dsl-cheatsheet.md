@@ -23,6 +23,17 @@ collection.operation()                       # Collection-level operation
 - Named args: `grep("pattern", context_lines=3)`
 - Raw strings for multi-line: delimit with `@@@@@` on own lines
 
+## Path Resolution
+
+Partial paths resolve automatically when they uniquely identify a file:
+
+```
+my-project[handler.go].read()               # Resolves to src/internal/handler.go
+my-drive["PromissoryNote"].read()            # Resolves to full Drive path
+```
+
+If multiple files match, you'll see suggestions. For Drive files with special characters in their names, a unique filename prefix is often the easiest way to reference them.
+
 ## Navigation
 
 | Operation | What it does | Example |
