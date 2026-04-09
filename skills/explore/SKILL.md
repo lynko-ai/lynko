@@ -24,10 +24,10 @@ my-project.tree()                            # Full directory structure
 Navigate documents top-down — don't read the whole file when you need one section:
 
 ```
-`my-project`[docs/guide.md].toc()           # Table of contents with line numbers
-`my-project`[docs/guide.md].section("Setup") # Read just that section
-`my-project`[docs/guide.md].lines("10-30")  # Read specific lines
-`my-project`[docs/guide.md].read()          # Full file (last resort for small files)
+my-project[docs/guide.md].toc()           # Table of contents with line numbers
+my-project[docs/guide.md].section("Setup") # Read just that section
+my-project[docs/guide.md].lines("10-30")  # Read specific lines
+my-project[docs/guide.md].read()          # Full file (last resort for small files)
 ```
 
 ## Reading Code
@@ -35,9 +35,9 @@ Navigate documents top-down — don't read the whole file when you need one sect
 Use structure-aware navigation instead of reading entire source files:
 
 ```
-`my-project`[src/server.go].outline()        # Types, functions, signatures
-`my-project`[src/server.go].expand("Main")   # One function's full body
-`my-project`[src/server.go].lines("40-60")   # Specific line range
+my-project[src/server.go].outline()        # Types, functions, signatures
+my-project[src/server.go].expand("Main")   # One function's full body
+my-project[src/server.go].lines("40-60")   # Specific line range
 ```
 
 `outline()` shows the structure. `expand()` shows the details. This keeps context minimal.
@@ -88,8 +88,8 @@ Follow this pattern for efficient exploration:
 Combine multiple commands in one call for efficiency:
 
 ```
-`my-project`[src/server.go].outline()
-`my-project`[src/handler.go].outline()
+my-project[src/server.go].outline()
+my-project[src/handler.go].outline()
 my-project[src/].grep("TODO")
 ```
 

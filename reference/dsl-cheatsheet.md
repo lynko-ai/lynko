@@ -155,8 +155,8 @@ artifacts()                                  # List all collections and operatio
 Put multiple commands on separate lines in one call:
 
 ```
-`my-project`[src/server.go].outline()
-`my-project`[src/handler.go].outline()
+my-project[src/server.go].outline()
+my-project[src/handler.go].outline()
 my-project[src/].grep("TODO")
 ```
 

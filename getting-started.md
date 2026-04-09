@@ -76,21 +76,21 @@ Then explore a collection:
 ```
 my-project.ls()                              # What files are here?
 my-project.ls("src/")                        # What's in src/?
-`my-project`[README.md].read()              # Read the README
+my-project[README.md].read()              # Read the README
 ```
 
 Navigate structured content:
 
 ```
-`my-project`[docs/guide.md].toc()           # See the table of contents
-`my-project`[docs/guide.md].section("Setup") # Read just the Setup section
+my-project[docs/guide.md].toc()           # See the table of contents
+my-project[docs/guide.md].section("Setup") # Read just the Setup section
 ```
 
 Navigate code:
 
 ```
-`my-project`[src/main.go].outline()          # See types, functions, signatures
-`my-project`[src/main.go].expand("Handler")  # Read one function in full
+my-project[src/main.go].outline()          # See types, functions, signatures
+my-project[src/main.go].expand("Handler")  # Read one function in full
 ```
 
 Search across files:
@@ -106,7 +106,7 @@ my-project[**/*.go].grep("error")            # Search only .go files
 Make a change:
 
 ```
-`my-project`[README.md].draft.edit("old text here", "new text here")
+my-project[README.md].draft.edit("old text here", "new text here")
 ```
 
 Review what changed:
@@ -114,7 +114,7 @@ Review what changed:
 ```
 my-project.status()                          # Which files have drafts?
 my-project.diff()                            # See the actual changes
-`my-project`[README.md].diff()              # Diff for one file
+my-project[README.md].diff()              # Diff for one file
 ```
 
 Commit when ready:
@@ -126,7 +126,7 @@ my-project.commit("docs: update README")
 If you want to undo:
 
 ```
-`my-project`[README.md].draft.discard()     # Discard one file's draft
+my-project[README.md].draft.discard()     # Discard one file's draft
 my-project.restore()                         # Discard all drafts
 ```
 

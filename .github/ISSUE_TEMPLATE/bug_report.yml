@@ -18,9 +18,16 @@ body:
         - Claude Desktop
         - ChatGPT
         - Cursor
-        - Other (specify below)
+        - Other (specify in additional context)
     validations:
       required: true
+
+  - type: input
+    id: client-version
+    attributes:
+      label: Client version (if known)
+      description: Version or build number of your MCP client.
+      placeholder: "e.g., Claude Desktop 1.2.3"
 
   - type: dropdown
     id: collection-type
@@ -31,6 +38,21 @@ body:
         - Git repository
         - Google Drive
         - Not applicable
+    validations:
+      required: true
+
+  - type: dropdown
+    id: failure-category
+    attributes:
+      label: Failure category
+      description: What kind of operation failed?
+      options:
+        - Read / navigate (ls, toc, section, outline, grep, etc.)
+        - Edit / draft (draft.edit, draft.append, draft.replace, etc.)
+        - Sync (pull, collection sync, Drive sync)
+        - Auth / connection (OAuth, MCP connection, permissions)
+        - Commit / push
+        - Other
     validations:
       required: true
 
@@ -65,8 +87,27 @@ body:
       description: Paste any error message you received.
       render: text
 
+  - type: dropdown
+    id: reproducibility
+    attributes:
+      label: Reproducibility
+      description: How consistently can you reproduce this?
+      options:
+        - Every time
+        - Sometimes
+        - Only happened once
+        - Haven't retried
+
+  - type: checkbox
+    id: other-collection
+    attributes:
+      label: Cross-collection check
+      options:
+        - label: I checked whether this issue also happens on a different collection
+          required: false
+
   - type: textarea
     id: additional
     attributes:
       label: Additional context
-      description: Anything else that might help — screenshots, steps to reproduce, etc.
+      description: Anything else that might help — screenshots, steps to reproduce, workarounds tried, etc.

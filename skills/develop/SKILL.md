@@ -31,8 +31,8 @@ my-project.log()                             # Recent commit history
 Navigate top-down. Never read large files in full — use structure-aware operations:
 
 ```
-`my-project`[src/server.go].outline()        # See types, functions, signatures
-`my-project`[src/server.go].expand("Handler") # Read one function
+my-project[src/server.go].outline()        # See types, functions, signatures
+my-project[src/server.go].expand("Handler") # Read one function
 my-project[src/].grep("handleAuth", context_lines=3)  # Find in context
 ```
 
@@ -50,13 +50,13 @@ my-project.find_references("UserService")
 Match existing text and replace it:
 
 ```
-`my-project`[src/config.go].draft.edit("debug: true", "debug: false")
+my-project[src/config.go].draft.edit("debug: true", "debug: false")
 ```
 
 Scope to a function to avoid accidental matches elsewhere:
 
 ```
-`my-project`[src/server.go].expand("Handler").draft.edit("old code", "new code")
+my-project[src/server.go].expand("Handler").draft.edit("old code", "new code")
 ```
 
 ### Multi-line edits with raw strings
@@ -64,7 +64,7 @@ Scope to a function to avoid accidental matches elsewhere:
 Use `@@@@@` delimiters for multi-line code — no escaping needed:
 
 ```
-`my-project`[src/server.go].draft.edit(
+my-project[src/server.go].draft.edit(
 @@@@@
 func old() {
     fmt.Println("hello")
@@ -88,17 +88,17 @@ If your content itself contains `@@@@@`, use an alternative delimiter: `@@@`, `"
 When content matching is tricky, replace by line number:
 
 ```
-`my-project`[src/server.go].lines("42").draft.replace("new line content")
-`my-project`[src/server.go].lines("10-15").draft.replace("replacement block")
+my-project[src/server.go].lines("42").draft.replace("new line content")
+my-project[src/server.go].lines("10-15").draft.replace("replacement block")
 ```
 
 ### Other operations
 
 ```
-`my-project`[src/server.go].draft.append("\n\n// New code")  # Append to end
-`my-project`[src/new-file.go].draft("package main\n...")     # Create new file
-`my-project`[src/old.go].mv("src/new.go")                   # Rename/move
-`my-project`[src/unused.go].rm()                             # Delete
+my-project[src/server.go].draft.append("\n\n// New code")  # Append to end
+my-project[src/new-file.go].draft("package main\n...")     # Create new file
+my-project[src/old.go].mv("src/new.go")                   # Rename/move
+my-project[src/unused.go].rm()                             # Delete
 ```
 
 ## Edit Tips
@@ -116,7 +116,7 @@ If `draft.edit()` fails because the old text doesn't match exactly:
 ```
 my-project.status()                          # File-level overview
 my-project.diff()                            # All changes summarized
-`my-project`[src/server.go].diff()          # Full diff for one file
+my-project[src/server.go].diff()          # Full diff for one file
 ```
 
 ## Testing
@@ -148,6 +148,6 @@ Use conventional commit format: `type(scope): description`.
 ## Undoing Changes
 
 ```
-`my-project`[src/server.go].draft.discard()  # Discard one file
+my-project[src/server.go].draft.discard()  # Discard one file
 my-project.restore()                          # Discard all drafts
 ```

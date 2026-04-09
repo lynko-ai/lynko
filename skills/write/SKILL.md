@@ -13,7 +13,7 @@ description: >
 Create a new file in a collection:
 
 ```
-`my-project`[docs/new-guide.md].draft("# Getting Started\n\nIntroduction goes here.")
+my-project[docs/new-guide.md].draft("# Getting Started\n\nIntroduction goes here.")
 ```
 
 The file exists as a draft until you commit.
@@ -23,7 +23,7 @@ The file exists as a draft until you commit.
 ### Replace specific text
 
 ```
-`my-project`[docs/guide.md].draft.edit("old paragraph text", "new paragraph text")
+my-project[docs/guide.md].draft.edit("old paragraph text", "new paragraph text")
 ```
 
 ### Scoped editing
@@ -31,7 +31,7 @@ The file exists as a draft until you commit.
 Target a specific section to avoid accidental matches:
 
 ```
-`my-project`[docs/guide.md].section("Installation").draft.edit("npm install", "npm install my-package")
+my-project[docs/guide.md].section("Installation").draft.edit("npm install", "npm install my-package")
 ```
 
 ### Multi-line content with raw strings
@@ -39,7 +39,7 @@ Target a specific section to avoid accidental matches:
 Use `@@@@@` delimiters for blocks of content:
 
 ```
-`my-project`[docs/guide.md].draft.edit(
+my-project[docs/guide.md].draft.edit(
 @@@@@
 ## Old Section
 
@@ -59,7 +59,7 @@ Opening and closing delimiters must be on their own lines. If your content conta
 ### Append to a document
 
 ```
-`my-project`[docs/guide.md].draft.append("\n\n## New Section\n\nContent here.")
+my-project[docs/guide.md].draft.append("\n\n## New Section\n\nContent here.")
 ```
 
 Note: `draft.append()` does raw concatenation — always include `\n` for newlines.
@@ -69,8 +69,8 @@ Note: `draft.append()` does raw concatenation — always include `\n` for newlin
 Always check existing content before editing:
 
 ```
-`my-project`[docs/guide.md].toc()           # See the structure
-`my-project`[docs/guide.md].section("Setup") # Read the section you'll edit
+my-project[docs/guide.md].toc()           # See the structure
+my-project[docs/guide.md].section("Setup") # Read the section you'll edit
 ```
 
 This ensures your edits match the actual current text.
@@ -79,14 +79,14 @@ This ensures your edits match the actual current text.
 
 ```
 my-project.status()                          # See which files have drafts
-`my-project`[docs/guide.md].diff()          # Review changes in detail
+my-project[docs/guide.md].diff()          # Review changes in detail
 my-project.commit("docs: update installation guide")
 ```
 
 ## Discarding Changes
 
 ```
-`my-project`[docs/guide.md].draft.discard()  # Discard one file
+my-project[docs/guide.md].draft.discard()  # Discard one file
 my-project.restore()                          # Discard all drafts
 ```
 

@@ -24,7 +24,7 @@ Collection-level diff gives an overview. File-level diff gives full hunks:
 
 ```
 my-project.diff()                            # File names and line counts
-`my-project`[src/server.go].diff()          # Full content diff for one file
+my-project[src/server.go].diff()          # Full content diff for one file
 ```
 
 ## Comparing Branches
@@ -39,9 +39,9 @@ my-project.compare(base=main, mode=patch)    # Full patch vs main
 When reviewing a change, read the surrounding context:
 
 ```
-`my-project`[src/server.go].outline()        # See the full structure
-`my-project`[src/server.go].expand("Handler") # Read the changed function
-`my-project`[src/server.go].lines("35-55")   # Read around the change
+my-project[src/server.go].outline()        # See the full structure
+my-project[src/server.go].expand("Handler") # Read the changed function
+my-project[src/server.go].lines("35-55")   # Read around the change
 ```
 
 ## Tracing Impact

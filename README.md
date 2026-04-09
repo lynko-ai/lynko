@@ -13,8 +13,8 @@ Once connected, try:
 
 ```
 my-project.ls()                              # See what's here
-`my-project`[src/main.go].outline()          # Types, functions, signatures
-`my-project`.grep("TODO", context_lines=2)   # Search across all files
+my-project[src/main.go].outline()          # Types, functions, signatures
+my-project.grep("TODO", context_lines=2)   # Search across all files
 ```
 
 ## How It Works
@@ -25,10 +25,10 @@ Lynko exposes your content sources as **collections** — git repos, Drive folde
 
 ```
 my-project.ls()                              # List files
-`my-project`[README.md].toc()               # Table of contents
-`my-project`[README.md].section("Setup")    # Read one section
-`my-project`[src/server.go].outline()       # Code structure
-`my-project`[src/server.go].expand("Main")  # One function's full body
+my-project[README.md].toc()               # Table of contents
+my-project[README.md].section("Setup")    # Read one section
+my-project[src/server.go].outline()       # Code structure
+my-project[src/server.go].expand("Main")  # One function's full body
 ```
 
 **Search and discover:**
@@ -44,7 +44,7 @@ my-project.find_references("UserService")   # Find all usages
 **Edit through conversation:**
 
 ```
-`my-project`[src/config.go].draft.edit("debug: true", "debug: false")
+my-project[src/config.go].draft.edit("debug: true", "debug: false")
 my-project.diff()                            # Review changes
 my-project.commit("fix: disable debug mode") # Commit and push
 ```
