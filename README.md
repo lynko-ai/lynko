@@ -7,38 +7,25 @@ The cognitive OS for AI agents. Navigate, edit, and act on your content through 
 1. **Sign up** at [auth.lynko.ai](https://auth.lynko.ai/v1/ui/auth/signup) (invite required during early access)
 2. **Add a data source** — connect a git repo or Google Drive folder from your dashboard
 3. **Connect your AI client** — add a custom MCP connector with `https://mcp.lynko.ai/`
-4. **Start exploring** — ask your agent to list files, search, or read content
 
-Once connected, try:
+## What Makes It Different
 
-```
-my-project.ls()                              # See what's here
-my-project[src/main.go].outline()          # Types, functions, signatures
-my-project.grep("TODO", context_lines=2)   # Search across all files
-```
+Lynko gives agents **content-intelligent navigation** — not just file access, but structure-aware operations that match how content is naturally organized.
 
-## How It Works
-
-Lynko exposes your content sources as **collections** — git repos, Drive folders, documents — and lets AI agents navigate them through a natural DSL. No file downloads, no format-specific tools, no context window overflow.
-
-**Read and navigate:**
+**Code:** understand structure without reading entire files.
 
 ```
-my-project.ls()                              # List files
-my-project[README.md].toc()               # Table of contents
-my-project[README.md].section("Setup")    # Read one section
-my-project[src/server.go].outline()       # Code structure
-my-project[src/server.go].expand("Main")  # One function's full body
+my-project[src/server.go].outline()          # Types, functions, signatures
+my-project[src/server.go].expand("Handler")  # One function's full body
+my-project.find_definition("UserService")    # Jump to definition
+my-project.find_references("UserService")    # Trace all usages
 ```
 
-**Search and discover:**
+**Docs:** navigate by structure, not by scrolling.
 
 ```
-my-project.grep("handleAuth")               # Find across all files
-my-project[src/].grep("TODO")               # Search under a directory
-my-project[**/*.go].grep("error")           # Search only .go files
-my-project.find_definition("UserService")   # Jump to definition
-my-project.find_references("UserService")   # Find all usages
+my-project[docs/guide.md].toc()              # Table of contents
+my-project[docs/guide.md].section("Setup")   # Read just one section
 ```
 
 **Edit through conversation:**
@@ -48,6 +35,10 @@ my-project[src/config.go].draft.edit("debug: true", "debug: false")
 my-project.diff()                            # Review changes
 my-project.commit("fix: disable debug mode") # Commit and push
 ```
+
+**Smart resolution:** paths resolve automatically. `my-project[handler.go]` finds `src/internal/handler.go` if unique. `section("setup")` matches "Setup Guide". You can even skip the collection name — `src/main.go` resolves to the right collection automatically if the file is unambiguous across your workspace.
+
+Filesystem operations (`ls`, `grep`, `find`) and scoped search (`my-project[src/].grep("pattern")`) work as you'd expect. See the [DSL cheatsheet](reference/dsl-cheatsheet.md) for the full reference.
 
 ## What's in This Repo
 

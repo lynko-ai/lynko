@@ -25,14 +25,31 @@ collection.operation()                       # Collection-level operation
 
 ## Path Resolution
 
-Partial paths resolve automatically when they uniquely identify a file:
+**Bracket notation** resolves in this order:
+
+1. Contains `*` → **glob scope** (`my-project[**/*.go].grep("TODO")`)
+2. Ends with `/` → **directory scope** (`my-project[src/].grep("TODO")`)
+3. Exact file match → **file reference** (`my-project[src/main.go].read()`)
+4. Prefix matches a directory → **directory scope** (`my-project[src].grep("TODO")` — trailing slash optional)
+5. None of the above → **partial match** across all files
+
+**Partial path matching** (Single Match Resolution):
 
 ```
 my-project[handler.go].read()               # Resolves to src/internal/handler.go
+my-project[0001].read()                      # Resolves if only one file contains "0001"
 my-drive["PromissoryNote"].read()            # Resolves to full Drive path
 ```
 
-If multiple files match, you'll see suggestions. For Drive files with special characters in their names, a unique filename prefix is often the easiest way to reference them.
+Matching is case-insensitive. If multiple files match, you'll get suggestions. Section names resolve the same way: `section("setup")` matches "Setup Guide" if it's the only match.
+
+**Auto-resolve across collections:**
+
+```
+`src/main.go`.outline()                      # Resolves to the right collection automatically
+```
+
+If a path uniquely identifies a file across all collections in the pod, you don't need to specify the collection name. If ambiguous, you'll get an error showing which collections matched.
 
 ## Navigation
 
@@ -71,6 +88,18 @@ my-project[src/].grep("pattern")             # Under a directory
 my-project[**/*.go].grep("pattern")          # Only .go files (any depth)
 my-project[*.md].grep("pattern")             # Only .md files (root level)
 ```
+
+**Which operations support scoping:**
+
+| Operation | Directory scope | Glob scope |
+|-----------|:-:|:-:|
+| `grep` | ✓ | ✓ |
+| `find` | ✓ | ✓ |
+| `ls` | ✓ | — (use `find`) |
+| `find_definition` | ✓ | — (use dir scope) |
+| `find_references` | ✓ | — (use dir scope) |
+
+Scope provides defaults — explicit arguments override. For example, `my-project[docs/].ls("adr")` lists `adr/`, not `docs/adr/`.
 
 ## Editing
 
@@ -134,7 +163,9 @@ new content that mentions @@@@@ delimiters
 | `commit(message)` | Commit and push | `my-project.commit("feat: add auth")` |
 | `log(max?)` | Commit history | `my-project.log(max=20)` |
 | `log(commit=hash)` | One commit's full message | `my-project.log(commit="abc1234")` |
-| `compare(base)` | Compare branches | `my-project.compare(base=main)` |
+| `compare(base)` | Stat summary vs branch | `my-project.compare(base=main)` |
+| `compare(base, mode=patch)` | Full patch vs branch | `my-project.compare(base=main, mode=patch)` |
+| `pull()` | Pull latest changes | `my-project.pull()` |
 | `restore()` | Discard all drafts | `my-project.restore()` |
 | `draft.discard()` | Discard one file's draft | `my-project[file.go].draft.discard()` |
 
