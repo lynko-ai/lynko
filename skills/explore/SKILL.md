@@ -38,6 +38,19 @@ my-project[paper.md].section("Methods > Data Collection")  # Specific subsection
 
 Intermediate levels can be skipped — partial paths resolve if unique.
 
+## Reading PDFs
+
+PDFs use pages as their natural unit. Text pages return text; image-only pages return rendered images automatically:
+
+```
+my-project[paper.pdf].toc()                   # Bookmarks as table of contents
+my-project[paper.pdf].pages("1-3")            # Text or image per page (automatic)
+my-project[paper.pdf].pages("5", as="image")  # Force rendered PNG
+my-project[paper.pdf].grep("methodology")     # Search extracted text
+```
+
+For mixed PDFs (some text pages, some scanned), `pages()` decides per-page — no special handling needed.
+
 ## Reading Code
 
 Use structure-aware navigation instead of reading entire source files:

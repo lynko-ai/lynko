@@ -80,6 +80,16 @@ my-project[docs/api.md].section("API Design > Error Handling")
 
 Intermediate levels can be skipped — `section("Neural Networks > Estimation Error")` resolves even without naming every parent.
 
+**Reading PDFs:** PDFs use pages as their natural unit. `pages()` returns the most useful content per page automatically — extracted text for text pages, rendered PNG for image-only pages. Mixed PDFs decide per-page.
+
+| Call | What you get |
+|------|-------------|
+| `pages("1-5")` | Text or image per page (automatic) |
+| `pages("2", as="image")` | Rendered PNG regardless of text |
+| `pages("2", as="text")` | Text only (errors if unavailable) |
+
+`toc()` and `section()` work on PDFs with bookmarks. `grep()` searches extracted text.
+
 ## Searching
 
 | Operation | What it does | Example |
