@@ -208,11 +208,15 @@ new content that mentions @@@@@ delimiters
 my-project.test(targets="my-component")      # Run tests on current drafts
 ```
 
-`test()` returns immediately with a run ID. Wait for the run to complete, then check results:
+`test()` returns immediately with a run ID. Navigate results top-down:
 
 ```
-ci["run-ID"].ls()                            # List test run outputs
-ci["run-ID"].grep("FAIL", context_lines=3)   # Find failures
+ci.history()                                 # List recent runs with status
+ci.status()                                  # Testable collections + active runs
+ci["run-ID"].ls()                            # List results (passed/failed/skipped)
+ci["run-ID/34"].read()                       # Read specific result by index
+ci["run-ID"].read(result_index="test-unit: my-component")  # Read by name
+ci["run-ID"].grep("FAIL", context_lines=3)   # Search across all results
 ```
 
 ## Pod-Level Operations

@@ -8,63 +8,94 @@ description: >
 
 # Develop with Lynko
 
-## Workflow Overview
+For full syntax details, see the [DSL cheatsheet](../reference/dsl-cheatsheet.md).
 
-1. Check for existing drafts → `status()`
-2. Read relevant code → `outline()`, `expand()`, `grep()`
-3. Make changes → `draft.edit()`, `draft.append()`
-4. Review → `diff()`, `status()`
-5. Test → `test()`
-6. Commit → `commit()`
+## Workflow
 
-## Start of Session
+1. **Check state** → `status()`, `log()`
+2. **Read code** → `outline()`, `expand()`, `grep()`
+3. **Edit** → `draft.edit()`, `lines().draft.replace()`
+4. **Review** → `diff()`, `status()`
+5. **Test** → `test()`, `ci["run-ID"].ls()`
+6. **Commit** → `commit()`
 
-Always check for pending work first:
-
-```
-my-project.status()                          # Any existing drafts?
-my-project.log()                             # Recent commit history
-```
-
-## Reading Code
-
-Navigate top-down. Never read large files in full — use structure-aware operations:
+## 1. Check State
 
 ```
-my-project[src/server.go].outline()        # See types, functions, signatures
-my-project[src/server.go].expand("Handler") # Read one function
-my-project[src/].grep("handleAuth", context_lines=3)  # Find in context
+my-project.status()                          # Any pending drafts?
+my-project.log()                             # Recent commits
 ```
 
-Use `find_definition()` and `find_references()` to trace code across files:
+## 2. Read Code
+
+Navigate top-down — never read large files in full:
 
 ```
-my-project.find_definition("UserService")
-my-project.find_references("UserService")
+my-project[src/server.go].outline()          # Types, functions, signatures
+my-project[src/server.go].expand("Handler")  # One function's body
+my-project.find_definition("UserService")    # Jump to definition
+my-project.find_references("UserService")    # Trace all usages
+my-project[src/].grep("handleAuth", context_lines=3)
 ```
 
-## Editing
+## 3. Edit
 
-### Content-addressed edit (primary method)
-
-Match existing text and replace it:
-
-```
-my-project[src/config.go].draft.edit("debug: true", "debug: false")
-```
-
-Scope to a function to avoid accidental matches elsewhere:
+**Content-addressed** (primary) — match and replace exact text:
 
 ```
 my-project[src/server.go].expand("Handler").draft.edit("old code", "new code")
 ```
 
-### Multi-line edits with raw strings
-
-Use `@@@@@` delimiters for multi-line code — no escaping needed:
+**Position-addressed** (fallback) — replace by line number:
 
 ```
-my-project[src/server.go].draft.edit(
+my-project[src/server.go].lines("42").draft.replace("new content")
+```
+
+**New files:**
+
+```
+my-project[src/new-file.go].draft("package main\n...")
+```
+
+## 4. Review
+
+```
+my-project.status()                          # Which files changed?
+my-project.diff()                            # All changes summarized
+my-project[src/server.go].diff()             # One file's full diff
+```
+
+## 5. Test
+
+`test()` runs against draft content — no commit needed:
+
+```
+my-project.test(targets="my-component")
+```
+
+Navigate results top-down:
+
+```
+ci.history()                                 # Recent runs with status
+ci["run-ID"].ls()                            # Results: passed/failed/skipped
+ci["run-ID/34"].read()                       # Drill into one result
+ci["run-ID"].grep("FAIL", context_lines=3)   # Search across results
+```
+
+## 6. Commit
+
+```
+my-project.diff()                            # Final review
+my-project.commit("feat(auth): add token refresh")
+```
+
+## Undoing Changes
+
+```
+my-project[src/server.go].draft.discard()    # Discard one file
+my-project.restore()                         # Discard all drafts
+```
 @@@@@
 func old() {
     fmt.Println("hello")

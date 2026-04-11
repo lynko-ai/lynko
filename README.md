@@ -67,7 +67,6 @@ Lynko ships skills that follow the [Agent Skills](https://agentskills.io) open s
 |-------|-------------|
 | [explore](skills/explore/) | Browsing repos, reading docs, searching code |
 | [develop](skills/develop/) | Full development workflow: read, edit, test, commit |
-| [edit](skills/edit/) | Editing content: scoped edits, replacements, new files |
 | [review](skills/review/) | Reviewing changes, reading diffs |
 
 See [skills/README.md](skills/README.md) for installation instructions.

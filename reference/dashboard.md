@@ -53,3 +53,5 @@ Pods group collections into workspaces. Your default pod is created automaticall
 - Each MCP connection uses one pod
 - Collections can be in multiple pods
 - Drafts are scoped to the pod — edits in one pod don't affect another
+
+Each pod shows its attached **nodes** (e.g., `ci → native:ci`) on its card. Nodes control which services are available — for example, `test()` only works when a CI node is attached. New pods come with a CI node by default.
