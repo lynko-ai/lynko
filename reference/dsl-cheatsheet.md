@@ -61,6 +61,15 @@ If a path uniquely identifies a file across all collections in the pod, you don'
 | `toc()` | Table of contents (markdown) | `my-project[README.md].toc()` |
 | `outline()` | Code structure (types, functions) | `my-project[main.go].outline()` |
 
+**Content types use different navigation patterns:**
+
+| Content | Structure | Targeted | Full |
+|---------|-----------|----------|------|
+| Code | `outline()` | `expand("Symbol")`, `lines("10-20")` | `read()` |
+| Markdown/Docs | `toc()` | `section("Heading")`, `lines("10-20")` | `read()` |
+| PDF | `toc()` | `pages("1,3-5")` | `read()` |
+| Collections | `ls()`, `tree()` | `grep()`, `find()` | — |
+
 ## Reading
 
 | Operation | What it does | Example |

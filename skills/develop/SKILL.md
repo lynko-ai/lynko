@@ -19,6 +19,8 @@ For full syntax details, see the [DSL cheatsheet](../reference/dsl-cheatsheet.md
 5. **Test** → `test()`, `ci["run-ID"].ls()`
 6. **Commit** → `commit()`
 
+Use multi-command syntax (multiple commands separated by newlines in one call) to reduce round trips.
+
 ## 1. Check State
 
 ```
