@@ -57,7 +57,7 @@ The guide you're reading becomes navigable through the tool it describes.
 |------|---------------|
 | [getting-started.md](getting-started.md) | Step-by-step onboarding guide |
 | [skills/](skills/) | Agent skills for common workflows |
-| [reference/](reference/) | DSL cheatsheet and FAQ |
+| [reference/](reference/) | DSL cheatsheet, FAQ, and dashboard guide |
 
 ## Skills
 

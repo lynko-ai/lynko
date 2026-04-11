@@ -26,8 +26,9 @@ From your dashboard, add a collection:
 
 **Google Drive:**
 - Click **+ Add Google Drive**
-- Authorize access to your Google account
-- Select the folder to connect
+- Paste the folder URL (e.g., `https://drive.google.com/drive/folders/...`) or folder ID
+- If not yet connected, a Google login page will appear — sign in to authorize
+- If already connected, your existing Google account is used automatically
 
 Your collections appear in the Collections panel once synced.
 
@@ -140,5 +141,6 @@ my-project.restore()                         # Discard all drafts
 ## Next Steps
 
 - Browse the [DSL cheatsheet](reference/dsl-cheatsheet.md) for all operations
+- Read the [dashboard guide](reference/dashboard.md) for credentials and collection management
 - Load a [skill](skills/) for your workflow
 - Read the [FAQ](reference/faq.md) for common questions
