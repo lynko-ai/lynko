@@ -34,6 +34,9 @@ No. `test()` runs against your current draft content. Test first, commit after t
 **Do I need to push after committing?**
 No. `commit()` handles both commit and push in one operation.
 
+**How does `merge()` work?**
+`merge("main")` merges `main` into your current branch. Auto-resolved files and conflicts all become drafts. Conflicts contain `<<<<<<` / `>>>>>>` markers that you resolve with `draft.edit()`. After resolving, `commit()` to finalize. It's not a GitHub PR — it merges directly and lets you resolve conflicts in-place.
+
 **Can multiple agents edit the same collection?**
 Drafts are scoped to your pod. Multiple agents using the same pod share draft state. For isolated work, use separate pods.
 

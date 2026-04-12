@@ -178,6 +178,25 @@ my-project.commit("feat(auth): add token refresh")
 
 Use conventional commit format: `type(scope): description`.
 
+## Merging Branches
+
+`merge("branch")` merges the named branch INTO your current branch. Conflicts become drafts:
+
+```
+my-project.merge("main")                    # Merge main into current branch
+```
+
+The output reports auto-resolved files, conflicts, and new files. Conflicts contain `<<<<<<` / `>>>>>>` markers — resolve them with normal edit operations:
+
+```
+my-project.grep("<<<<<<")                    # Find conflict markers
+my-project[src/server.go].draft.edit(...)    # Resolve conflict text
+my-project.diff()                            # Review the merge
+my-project.commit("merge: main into feature-branch")
+```
+
+This is not a pull request — it directly merges and creates drafts. You still need `commit()` to finalize.
+
 ## Undoing Changes
 
 ```

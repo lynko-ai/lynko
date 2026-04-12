@@ -222,6 +222,7 @@ new content that mentions @@@@@ delimiters
 | `compare(base)` | Stat summary vs branch | `my-project.compare(base=main)` |
 | `compare(base, mode=patch)` | Full patch vs branch | `my-project.compare(base=main, mode=patch)` |
 | `pull()` | Pull latest changes | `my-project.pull()` |
+| `merge(branch)` | Merge branch into current | `my-project.merge("main")` |
 | `restore()` | Discard all drafts | `my-project.restore()` |
 | `draft.discard()` | Discard one file's draft | `my-project[file.go].draft.discard()` |
 

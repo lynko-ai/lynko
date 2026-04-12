@@ -27,12 +27,15 @@ my-project.diff()                            # File names and line counts
 my-project[src/server.go].diff()          # Full content diff for one file
 ```
 
-## Comparing Branches
+## Comparing and Merging Branches
 
 ```
 my-project.compare(base=main)                # Stat summary vs main
 my-project.compare(base=main, mode=patch)    # Full patch vs main
+my-project.merge("main")                     # Merge main into current branch
 ```
+
+`merge()` creates drafts for all affected files. Conflicts have `<<<<<<` markers — resolve with `draft.edit()`, then `commit()`.
 
 ## Understanding Changed Code
 
