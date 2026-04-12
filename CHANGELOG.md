@@ -9,6 +9,6 @@ Initial public documentation and skills for the Lynko platform.
 ### Added
 
 - Getting started guide for new users
-- Agent skills: explore, develop, edit, review
+- Agent skills: explore, develop, review
 - DSL cheatsheet and FAQ
 - GitHub issue templates for bug reports and feature requests
