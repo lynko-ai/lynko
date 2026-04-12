@@ -51,6 +51,21 @@ my-project[paper.pdf].grep("methodology")     # Search extracted text
 
 For mixed PDFs (some text pages, some scanned), `pages()` decides per-page — no special handling needed.
 
+## Reading Spreadsheets
+
+Google Sheets in Drive collections use rows as their natural unit. Start with `sheets()` for the schema, then drill into data:
+
+```
+my-drive[Budget].sheets()                              # Sheet names, headers, dimensions
+my-drive[Budget].rows("1-10")                          # First 10 rows (single-sheet)
+my-drive[Budget].rows("Sales:1-10")                    # Sheet-qualified rows (multi-sheet)
+my-drive[Budget].rows("Sales:1-10", columns="Revenue,Cost")  # Column projection by header name
+my-drive[Budget].cells("Sales!B5:D15")                 # A1-notation access
+my-drive[Budget].grep("Widget")                        # Search with sheet+row context
+```
+
+`grep()` on spreadsheets returns sheet-aware results like `Sales Row 3:` — use the same addressing with `rows()` to follow up: `rows("Sales:3")`.
+
 ## Reading Code
 
 Use structure-aware navigation instead of reading entire source files:

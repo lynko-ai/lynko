@@ -9,7 +9,7 @@ Lynko is a platform that exposes your content sources (git repos, Google Drive, 
 Any client that supports MCP (Model Context Protocol) custom connectors. This includes Claude (Desktop and web), ChatGPT, and many developer tools. See the [getting started guide](../getting-started.md) for setup instructions.
 
 **What data sources can I connect?**
-Git repositories (public and private) and Google Drive folders. PDF documents, markdown files, and code files within those sources are all navigable.
+Git repositories (public and private) and Google Drive folders. PDF documents, markdown files, code files, and Google Sheets within those sources are all navigable. Sheets get dedicated operations — `sheets()`, `rows()`, `cells()` — for structured row-based access.
 
 **Is my data safe?**
 Lynko syncs content from your sources (GitHub, Google Drive) so agents can navigate it. Your original data remains under your control in its source platform. All access is authenticated through your account and scoped to your workspace.

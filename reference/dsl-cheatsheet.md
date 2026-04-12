@@ -60,6 +60,7 @@ If a path uniquely identifies a file across all collections in the pod, you don'
 | `find(pattern)` | Find files by glob | `my-project.find(*.go)` |
 | `toc()` | Table of contents (markdown) | `my-project[README.md].toc()` |
 | `outline()` | Code structure (types, functions) | `my-project[main.go].outline()` |
+| `sheets()` | Sheet names, headers, dimensions | `my-drive[Budget].sheets()` |
 
 **Content types use different navigation patterns:**
 
@@ -68,6 +69,7 @@ If a path uniquely identifies a file across all collections in the pod, you don'
 | Code | `outline()` | `expand("Symbol")`, `lines("10-20")` | `read()` |
 | Markdown/Docs | `toc()` | `section("Heading")`, `lines("10-20")` | `read()` |
 | PDF | `toc()` | `pages("1,3-5")` | `read()` |
+| Google Sheets | `sheets()` | `rows("Sales:1-10")`, `cells("B5:D15")` | `read()` |
 | Collections | `ls()`, `tree()` | `grep()`, `find()` | — |
 
 ## Reading
@@ -79,6 +81,9 @@ If a path uniquely identifies a file across all collections in the pod, you don'
 | `expand(symbol)` | One function/type body | `my-project[main.go].expand("Handler")` |
 | `lines(spec)` | Specific line range | `my-project[main.go].lines("10-30")` |
 | `pages(spec)` | PDF page range | `my-project[doc.pdf].pages("1-3")` |
+| `sheets()` | Sheet names, headers, dimensions | `my-drive[Budget].sheets()` |
+| `rows(spec)` | Row range with optional column projection | `my-drive[Budget].rows("Sales:1-10")` |
+| `cells(spec)` | Cell range via A1 notation | `my-drive[Budget].cells("Sales!B5:D15")` |
 
 **Hierarchical section paths:** when sections share common titles (like "Introduction" in multiple chapters), use ` > ` to disambiguate:
 
@@ -98,6 +103,17 @@ Intermediate levels can be skipped — `section("Neural Networks > Estimation Er
 | `pages("2", as="text")` | Text only (errors if unavailable) |
 
 `toc()` and `section()` work on PDFs with bookmarks. `grep()` searches extracted text.
+
+**Reading Google Sheets:** Google Sheets in Drive collections use rows as their natural unit. `sheets()` shows the schema, `rows()` navigates data, `cells()` is the A1 escape hatch.
+
+```
+my-drive[Budget].sheets()                              # Sheet names, headers, dimensions
+my-drive[Budget].rows("1-10")                          # First 10 rows (single-sheet)
+my-drive[Budget].rows("Sales:1-10", columns="Revenue,Cost")  # Sheet-qualified + column projection
+my-drive[Budget].cells("Sales!B5:D15")                 # A1-notation access
+```
+
+Multi-sheet spreadsheets require sheet qualification for `rows()` and `cells()`. Single-sheet spreadsheets work without it. `columns=` accepts header names (`"Revenue,Cost"`) or letter ranges (`"A:D"`).
 
 ## Searching
 
