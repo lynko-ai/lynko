@@ -40,6 +40,18 @@ No. `commit()` handles both commit and push in one operation.
 **Can multiple agents edit the same collection?**
 Drafts are scoped to your pod. Multiple agents using the same pod share draft state. For isolated work, use separate pods.
 
+**What's the difference between `test()` and `run()`?**
+`test()` runs your project's CI suite — targets come from your CI config (Makefile, GitHub Actions, etc.). `run()` executes any shell command on a target machine attached to the pod. Use `test()` for the canonical test set, `run()` for builds, scripts, inspections, or smoke tests. Both run against your current drafts on writable collections.
+
+**Why doesn't `run()` show up on my collection?**
+`run()` requires a runner node attached to your pod with at least one machine configured. If you only see CI-powered collections with `test()`, the runner node isn't attached yet. The runner is opt-in — bring your own SSH target.
+
+**Do I need to commit before running `run()`?**
+No. On writable collections, `run()` automatically checkpoints your drafts to a system branch before dispatching, so the machine sees your in-progress changes. When there are no drafts, `run()` uses a fast path and runs against the latest committed state — this works on both writable and public/read-only collections. Drafts on a read-only collection are rejected with `RUNNER_ERROR_CANNOT_CHECKPOINT` since there's no remote to push the checkpoint to.
+
+**My `run()` output is long — how do I read it efficiently?**
+Use `runner["run-id"].status()` for the summary, `runner["run-id"].lines("N-M")` for specific ranges, and `runner["run-id"].grep("pattern")` to search. Reserve `read()` for short output — `read()` returns the full captured log and has no range parameter. Very long outputs are bounded at ~10MB (head+tail split past the limit) — if you need the middle, scope the command to produce less output or redirect to a file on the target and read it with a follow-up run.
+
 ## Troubleshooting
 
 **"No artifacts found" after connecting**

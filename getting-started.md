@@ -58,7 +58,12 @@ Once connected, your agent has access to all collections in your workspace.
 
 **The DSL** is how agents interact with your content. Operations like `ls()`, `read()`, `grep()` let agents navigate without downloading entire files.
 
-**Nodes** are services attached to your pod — like CI for running tests. Your pod comes with a CI node by default. Nodes control what operations are available: `test()` only appears on collections when a CI node is attached.
+**Nodes** are services attached to your pod. Nodes control what operations are available on your collections:
+
+- **CI** (default) adds `test()` for running tests against your draft content.
+- **Runner** (opt-in, BYO machine) adds `run()` for executing arbitrary commands on a target machine you've connected over SSH — useful for builds, scripts, one-off inspections, or anything that needs to happen on a specific host.
+
+An operation only appears on a collection when the backing node is attached. If you don't see `test()` or `run()` in `artifacts()`, the node isn't attached to this pod.
 
 **Drafts** are uncommitted changes. When you edit through Lynko, changes are staged as drafts. Use `diff()` to review and `commit()` to save.
 

@@ -9,6 +9,7 @@ Agent skills for common Lynko workflows. These follow the [Agent Skills](https:/
 | [explore](explore/) | Navigate collections, read content, search code |
 | [develop](develop/) | Full dev workflow: read, edit, test, commit |
 | [review](review/) | Review changes, read diffs, cross-reference |
+| [run](run/) | Execute commands on a target machine (builds, scripts, smoke tests) via a runner node |
 
 ## Installation
 

@@ -245,7 +245,37 @@ ci["run-ID"].read(result_index="test-unit: my-component")  # Read by name
 ci["run-ID"].grep("FAIL", context_lines=3)   # Search across all results
 ```
 
-## Pod-Level Operations
+## Running Commands
+
+`run()` dispatches a command to a target machine via an attached runner node. Requires a runner node and at least one machine configured on your pod. Unlike `test()`, it runs against the current git state and doesn't need to be scoped to a CI build.
+
+```
+my-project.run("cd .. && ls")                # Dispatch a command; returns a run ID
+my-project.run("pytest -k widget")           # Any shell command
+my-project[src/].run("go build ./...")       # Scope to a subdirectory
+my-project.run("./deploy.sh", machine="prod", timeout="10m")   # Pick a machine, set timeout (Go duration: "30s", "5m", "1h30m")
+```
+
+`run()` returns immediately with a run ID. Poll results with runner ops:
+
+```
+runner.status()                              # Configured machines + active runs
+runner.history()                             # Recent runs (newest first)
+runner["run-ID"].status()                    # One run: state, duration, exit code
+runner["run-ID"].read()                      # Full captured output
+runner["run-ID"].lines("1-50")               # Head of output (range)
+runner["run-ID"].lines("100-120")            # Specific line range
+runner["run-ID"].grep("ERROR", context_lines=3)   # Search captured output
+runner["run-ID"].cancel()                    # Cancel a running command
+```
+
+During execution, `read()` / `grep()` / `lines()` query the target machine live over SSH. Once the run completes, output is captured to your pod and these operations read from the database — they keep working even if the machine is offline.
+
+### Tips
+
+- Combine with the full DSL: `my-project[src/server.go].draft.edit(...)` → `my-project.test(...)` → `my-project.run("./smoke.sh")` all run against your current drafts on writable collections.
+- Two execution paths: with drafts → checkpoint to a system branch, push, target fetches checkpoint; without drafts → fast path, target fetches the tracked branch directly. Drafts on a read-only collection (no push access) are rejected with `RUNNER_ERROR_CANNOT_CHECKPOINT`.
+- Long-running commands survive client disconnects — the run continues on the machine (via tmux), and `runner["run-ID"].status()` reports final state when it finishes.
 
 ```
 artifacts()                                  # List all collections and operations
