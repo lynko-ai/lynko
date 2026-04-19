@@ -65,3 +65,6 @@ Check the file path. Use `ls()` to see available files, or `find(*pattern*)` to 
 
 **Edits seem lost between sessions**
 Drafts persist across sessions within the same pod. Run `status()` at the start of each session to check for pending drafts. If you switched pods, drafts are in the other pod.
+
+**"Operation not available for this artifact"**
+Some operations are only advertised when the artifact's content supports them — e.g., `toc()` and `section()` on a PDF require bookmarks, `grep()` on a PDF requires extractable text, and `tab()` on a Google Doc requires multiple tabs. Run `my-collection[path/to/file].ls()` to see which operations are available for that specific artifact (shown as `Try: ...` in the AX response). For image-only PDFs, use `pages()`; for single-tab Google Docs, `read()` returns the full document.

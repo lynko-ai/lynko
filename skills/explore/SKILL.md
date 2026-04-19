@@ -51,6 +51,21 @@ my-project[paper.pdf].grep("methodology")     # Search extracted text
 
 For mixed PDFs (some text pages, some scanned), `pages()` decides per-page — no special handling needed.
 
+## Reading Google Docs
+
+Google Docs in Drive collections use paragraphs as their natural unit, with headings forming a hierarchical table of contents. Multi-tab documents expose each tab as a navigable unit.
+
+```
+my-drive[Roadmap].toc()                      # Heading hierarchy (+ tab list for multi-tab)
+my-drive[Roadmap].section("Phase 1")         # One section by heading
+my-drive[Roadmap].paragraphs("1-5")          # Paragraph range (single-tab)
+my-drive[Roadmap].paragraphs("Tab 1:1-5")    # Tab-qualified (multi-tab)
+my-drive[Roadmap].tab("Q4 Plan")             # Full content of one tab
+my-drive[Roadmap].grep("milestone")          # Search with section + tab context
+```
+
+`tab()` is advertised only on multi-tab documents. On single-tab Google Docs, `read()` returns the full document. Run `my-drive[Roadmap].ls()` to see which operations are available for a specific doc.
+
 ## Reading Spreadsheets
 
 Google Sheets in Drive collections use rows as their natural unit. Start with `sheets()` for the schema, then drill into data:
