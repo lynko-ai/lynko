@@ -1,3 +1,9 @@
+---
+title: FAQ
+audience: users
+last_validated: 2026-04-23
+---
+
 # FAQ
 
 ## General
@@ -13,6 +19,12 @@ Git repositories (public and private) and Google Drive folders. PDF documents, m
 
 **Is my data safe?**
 Lynko syncs content from your sources (GitHub, Google Drive) so agents can navigate it. Your original data remains under your control in its source platform. All access is authenticated through your account and scoped to your workspace.
+
+**My agent already has bash, grep, and file access. What does Lynko add?**
+Bash + grep gets you bytes. Lynko gets you *structural navigation* — the same way humans read: tables of contents, section headings, function outlines. An agent forced to rebuild these per-session (parsing PDFs with custom scripts, extracting markdown TOCs by hand, running ad-hoc AST tools) is essentially rebuilding Lynko — slowly, incompletely, and from scratch every time. Lynko ships the navigation once; every agent can use it immediately, across every content type and every source.
+
+**Why MCP, not a typed API like gRPC?**
+MCP is a text-in, text-out protocol. That matches how agents actually reason — they were trained on text and think in text. A rigid typed API would force the agent to translate between its natural mental model and a schema, wasting attention on protocol plumbing. MCP lets the agent stay in one mental mode. It's also the emerging standard — Claude, ChatGPT, Cursor, and most major AI clients support custom MCP connectors. Connect once, work everywhere.
 
 ## DSL
 

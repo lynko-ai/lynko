@@ -1,3 +1,9 @@
+---
+title: Lynko DSL Cheatsheet
+audience: users
+last_validated: 2026-04-23
+---
+
 # Lynko DSL Cheatsheet
 
 Quick reference for all Lynko operations.

@@ -1,3 +1,9 @@
+---
+title: Dashboard & Credentials
+audience: users
+last_validated: 2026-04-23
+---
+
 # Dashboard & Credentials
 
 Your dashboard is at [auth.lynko.ai/v1/ui/dashboard](https://auth.lynko.ai/v1/ui/dashboard). From here you manage collections, pods, and credentials.

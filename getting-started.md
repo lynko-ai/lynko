@@ -1,3 +1,9 @@
+---
+title: Getting Started with Lynko
+audience: users
+last_validated: 2026-04-23
+---
+
 # Getting Started with Lynko
 
 A step-by-step guide from zero to your first edit.

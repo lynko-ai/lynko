@@ -1,6 +1,12 @@
+---
+title: Lynko
+audience: users
+last_validated: 2026-04-23
+---
+
 # Lynko
 
-The cognitive OS for AI agents. Navigate, edit, and act on your content through a unified DSL — git repos, Google Drive, PDFs, and more.
+The cognitive layer for AI agents. Connect your content once; any agent can navigate, edit, and act on it through one DSL — git repos, Google Drive, PDFs, spreadsheets, and more.
 
 ## Quick Start
 
@@ -21,11 +27,14 @@ my-project.find_definition("UserService")    # Jump to definition
 my-project.find_references("UserService")    # Trace all usages
 ```
 
-**Docs:** navigate by structure, not by scrolling.
+**Docs, PDFs, and spreadsheets:** navigate by structure, not by scrolling.
 
 ```
-my-project[docs/guide.md].toc()              # Table of contents
-my-project[docs/guide.md].section("Setup")   # Read just one section
+my-project[docs/guide.md].toc()                          # Table of contents
+my-project[docs/guide.md].section("Setup")               # Read one section
+
+my-contracts[msa-2026.pdf].section("Indemnification")    # Jump to one clause in a PDF
+my-finance[q1-forecast.gsheet].sheets()                  # List spreadsheet tabs
 ```
 
 **Edit where you navigate:** the same operation that reads content also defines the edit scope.

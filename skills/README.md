@@ -1,3 +1,9 @@
+---
+title: Lynko Skills
+audience: users
+last_validated: 2026-04-23
+---
+
 # Lynko Skills
 
 Agent skills for common Lynko workflows. These follow the [Agent Skills](https://agentskills.io) open standard, the same format used by Claude Code, OpenAI Codex, GitHub Copilot, and Cursor.
