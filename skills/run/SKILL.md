@@ -30,6 +30,8 @@ runner.history()                             # Recent runs (newest first)
 
 If `runner.status()` fails with "node not attached," the runner isn't on this pod yet. If it succeeds but lists zero machines, attach one from the dashboard.
 
+**Assume nothing is preinstalled.** Machines are typically minimal Linux (Ubuntu) by default — `bash`, `wget`, `apt` (without sudo), `python3`, and standard userland are usually available, but `node`, `curl`, language toolchains, and other dev tools are not. Probe with `which <tool>` before relying on anything beyond standard userland. To install a CLI without sudo, prefer downloading a static binary into `$HOME` and running it directly (e.g., `wget` a release zip, `unzip`, run from `$HOME/.local/bin/`).
+
 ## Dispatch and Poll
 
 `run()` returns immediately with a run ID. Poll until terminal state before reading results:
@@ -45,6 +47,10 @@ runner["run-20260417T1145-abc1"].status()
 ```
 
 Terminal states: `succeeded`, `failed`, `canceled`. Anything else means still running.
+
+`run()` is dispatched from any writable collection (`my-project.run(...)`), but the run is queryable through the global `runner[]` accessor (`runner["run-ID"].status()`). These reference the same execution — collection scope is the dispatch context, `runner[]` is the read interface.
+
+**LLM-client polling pattern.** Most LLM clients (Claude, ChatGPT, Cursor, etc.) timeout tool calls at ~25 seconds, which is much shorter than typical build/test runs. The standard pattern is: dispatch with `run()`, then issue a separate `bash sleep N` (10-60s depending on expected duration) before calling `status()`. Don't try to block inside a single tool call — the client will time out before the runner finishes.
 
 ## Reading Output
 
@@ -118,3 +124,4 @@ my-project.commit("feat(handler): ...")
 - Long-running commands survive client disconnects. The run continues on the machine (via tmux); `runner["run-ID"].status()` reports the final state when the command finishes.
 - `runner.history()` paginates — the output includes the cursor for the next page.
 - Captured output is bounded at ~10MB (head+tail split past the limit, with a `--- OUTPUT TRUNCATED ---` marker between the halves). `read()`, `grep()`, and `lines()` all operate on the captured output; if truncation loses something you need, scope the command to produce less output or redirect to a file on the target and read it with a follow-up run.
+- For multi-line scripts with complex escapes (Python heredocs, embedded quotes, `\n` in strings), prefer writing the script to `/tmp/` first and executing by path, rather than passing the script inline. Pattern: `cat > /tmp/foo.py << 'EOF' ... EOF && python3 /tmp/foo.py`. Inline heredocs occasionally trip the output-capture path on short-lived commands; the file-on-disk path is robust. `/tmp/` persists across runs on the same machine.
