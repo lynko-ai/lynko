@@ -85,7 +85,8 @@ See [skills/README.md](skills/README.md) for installation instructions.
 
 We're in **[early access](reference/early-access.md)** — expect rough edges, and your feedback directly shapes the product. We respond to everything.
 
-- **Email**: [siyuan@lynko.ai](mailto:siyuan@lynko.ai) — fastest path for invite requests, urgent issues, or anything you'd rather not file publicly
+- **Invite request**: fill out the [early access form](https://forms.gle/g3uk9itQ6oWRaeA98)
+- **Email**: [siyuan@lynko.ai](mailto:siyuan@lynko.ai) — for urgent issues or anything you'd rather not file publicly
 - **GitHub Issues**: [open an issue](../../issues/new/choose) — for bugs and feature requests. Include your MCP client (Claude, ChatGPT, etc.) and the DSL command that failed, if applicable
 
 ## Status

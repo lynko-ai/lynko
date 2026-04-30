@@ -34,9 +34,11 @@ This will go away when we complete Google's verification.
 
 ## How do I get an invite?
 
-Email me at [siyuan@lynko.ai](mailto:siyuan@lynko.ai) with your name and (optionally) the Google account whose Drive you want to connect. We're activating users in small batches — typical turnaround is about 24 hours.
+Fill out the [early access form](https://forms.gle/g3uk9itQ6oWRaeA98). I'll get back to you within ~24 hours from `siyuan@lynko.ai` with your invite code and signup link.
 
-If you signed up without sharing a Google account email and want to connect Drive later, just reply to your activation email with the address you'll use, and we'll get you set up.
+If you signed up without sharing a Google account email and want to connect Drive later, just reply to your activation email with the address you'll use, and I'll get you set up.
+
+For anything not form-shaped (questions, urgent issues, partnership inquiries), email [siyuan@lynko.ai](mailto:siyuan@lynko.ai) directly.
 
 ## Does my Google account email need to match my Lynko account email?
 
