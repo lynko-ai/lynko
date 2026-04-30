@@ -10,7 +10,7 @@ The cognitive layer for AI agents. Connect your content once; any agent can navi
 
 ## Quick Start
 
-1. **Sign up** at [auth.lynko.ai](https://auth.lynko.ai/v1/ui/auth/signup) (invite required during early access)
+1. **Sign up** at [auth.lynko.ai](https://auth.lynko.ai/v1/ui/auth/signup) (invite required during [early access](reference/early-access.md))
 2. **Add a data source** — connect a git repo or Google Drive folder from your dashboard
 3. **Connect your AI client** — add a custom MCP connector with `https://mcp.lynko.ai/`
 
@@ -83,13 +83,18 @@ See [skills/README.md](skills/README.md) for installation instructions.
 
 ## Issues & Feedback
 
-Found a bug or have a feature request? [Open an issue](../../issues/new/choose).
+We're in **[early access](reference/early-access.md)** — expect rough edges, and your feedback directly shapes the product. We respond to everything.
 
-We're in **early access** — expect rough edges, and know that your feedback directly shapes the product. Please include your MCP client (Claude, ChatGPT, etc.) and the DSL command that failed, if applicable.
+- **Email**: [siyuan@lynko.ai](mailto:siyuan@lynko.ai) — fastest path for invite requests, urgent issues, or anything you'd rather not file publicly
+- **GitHub Issues**: [open an issue](../../issues/new/choose) — for bugs and feature requests. Include your MCP client (Claude, ChatGPT, etc.) and the DSL command that failed, if applicable
 
 ## Status
 
-🚧 **Early Access** — Lynko is pre-launch. No SLA, but actively developed. The platform and DSL may evolve based on feedback.
+🚧 **[Early Access](reference/early-access.md)** — Lynko is pre-launch. No SLA, but actively developed. The platform and DSL may evolve based on feedback.
+
+## Privacy & Data Handling
+
+Lynko's full privacy policy is at [auth.lynko.ai/v1/ui/auth/privacy](https://auth.lynko.ai/v1/ui/auth/privacy). A short summary lives at [reference/privacy.md](reference/privacy.md) — covers what we hold, what we don't train on, and how to delete your data.
 
 ## Links
 

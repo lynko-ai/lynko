@@ -10,7 +10,7 @@ A step-by-step guide from zero to your first edit.
 
 ## Prerequisites
 
-- An invite code (early access)
+- An invite code (see [early access](reference/early-access.md) for how to get one)
 - An MCP-compatible AI client (Claude, ChatGPT, or any client supporting custom MCP connectors)
 
 ## 1. Create Your Account
