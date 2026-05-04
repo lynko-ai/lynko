@@ -83,8 +83,8 @@ Detect by path or content signal:
 
 For Tier 3:
 
-- Required symbol-first flow before broad grep: `outline()` the changed file, `expand()` each changed production symbol, `find_references()` for changed signatures or behavior-affecting symbols, then `grep()` for legacy patterns and uncaught dynamic usage.
-- Example: `my-project[src/server.go].outline()` → `my-project[src/server.go].expand("Handler")` → `my-project.find_references("Handler")` → `my-project[src/].grep("legacyHandler", context_lines=2)`.
+- Required symbol-first flow before broad grep on the risky path: `outline()` only the changed or conflict-relevant file(s), `expand()` each changed production symbol involved, `find_references()` for changed signatures or behavior-affecting symbols, then `grep()` for legacy patterns and uncaught dynamic usage.
+- Example: `my-project[src/server.go].outline()` → `my-project[src/server.go].expand("Handler")` → `my-project.find_references("Handler")` → `my-project[src/].grep("legacyHandler", context_lines=2)`. Do not outline unrelated changed files unless the trace leads there.
 - Report format: **"TIER 3 — human judgment required: <specific reason>"**
 - Do not write "LGTM" — write "review complete, human approval required before merge"
 
