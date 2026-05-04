@@ -83,8 +83,8 @@ Detect by path or content signal:
 
 For Tier 3:
 
-- Full review: `outline()`, `diff()`, `expand()` on changed symbols, `find_references()` on changed signatures
-- `grep()` the broader codebase for callers and prior patterns
+- Required symbol-first flow before broad grep: `outline()` the changed file, `expand()` each changed production symbol, `find_references()` for changed signatures or behavior-affecting symbols, then `grep()` for legacy patterns and uncaught dynamic usage.
+- Example: `my-project[src/server.go].outline()` → `my-project[src/server.go].expand("Handler")` → `my-project.find_references("Handler")` → `my-project[src/].grep("legacyHandler", context_lines=2)`.
 - Report format: **"TIER 3 — human judgment required: <specific reason>"**
 - Do not write "LGTM" — write "review complete, human approval required before merge"
 
