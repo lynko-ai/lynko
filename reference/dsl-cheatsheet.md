@@ -81,6 +81,8 @@ If a path uniquely identifies a file across all collections in the pod, you don'
 
 ## Reading
 
+> All read operations show your current draft state when one exists, otherwise committed content. There is no separate "read the draft" namespace — `read()`, `grep()`, `section()`, etc. always reflect the working copy. Use `diff()` to compare draft vs committed.
+
 | Operation | What it does | Example |
 |-----------|-------------|---------|
 | `read()` | Full file content | `my-project[README.md].read()` |

@@ -40,6 +40,9 @@ The old text must match exactly, including whitespace. Use `grep()` or `lines()`
 **What does `@@@@@` mean?**
 It's a raw string delimiter. Content between `@@@@@` markers is passed through literally with no escaping needed. Use it for multi-line code edits. The opening and closing `@@@@@` must each be on their own line.
 
+**Do read operations see my drafts, or just committed content?**
+All read operations — `read()`, `grep()`, `lines()`, `section()`, `expand()`, `outline()`, `toc()`, `pages()`, etc. — transparently see your draft state when one exists, otherwise committed content. There's no separate "read the draft" namespace; reads always show the current working state. Only writes use the `.draft.` prefix (`draft.edit`, `draft.append`, `draft.replace`). After a sequence of edits, you can verify the result with the same operation you'd normally use: `[file].grep("pattern")` reflects your draft. Use `diff()` to see what's changed vs committed; use `status()` to list files with pending drafts.
+
 **Do I need to commit before running tests?**
 No. `test()` runs against your current draft content. Test first, commit after tests pass.
 

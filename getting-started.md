@@ -71,7 +71,7 @@ Once connected, your agent has access to all collections in your workspace.
 
 An operation only appears on a collection when the backing node is attached. If you don't see `test()` or `run()` in `artifacts()`, the node isn't attached to this pod.
 
-**Drafts** are uncommitted changes. When you edit through Lynko, changes are staged as drafts. Use `diff()` to review and `commit()` to save.
+**Drafts** are uncommitted changes. When you edit through Lynko, changes are staged as drafts. All read operations — `read()`, `grep()`, `section()`, etc. — transparently show your draft state when one exists, otherwise committed content. Only writes use the `.draft.` prefix. Use `diff()` to compare draft vs committed, and `commit()` to save.
 
 ## 5. Your First Session
 
