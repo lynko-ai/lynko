@@ -40,16 +40,22 @@ Intermediate levels can be skipped — partial paths resolve if unique.
 
 ## Reading PDFs
 
-PDFs use pages as their natural unit. Text pages return text; image-only pages return rendered images automatically:
+PDFs use pages as their natural unit. `pages()` defaults to extracted text; image-only pages return rendered images automatically.
 
 ```
 my-project[paper.pdf].toc()                   # Bookmarks as table of contents
-my-project[paper.pdf].pages("1-3")            # Text or image per page (automatic)
-my-project[paper.pdf].pages("5", as="image")  # Force rendered PNG
+my-project[paper.pdf].pages("1-3")            # Text per page (image fallback for scanned)
+my-project[paper.pdf].pages("5", as="image")  # Force rendered PNG (precision read)
 my-project[paper.pdf].grep("methodology")     # Search extracted text
 ```
 
-For mixed PDFs (some text pages, some scanned), `pages()` decides per-page — no special handling needed.
+**Default to text. Switch to image mode when:**
+
+- The answer lives in a multi-column table — financial statements, segment tables, multi-year comparisons. Text extraction can lose column-to-header alignment; vision reads the rendered page reliably.
+- Text shows weird symbols, dropped ligatures (`scal` for `fiscal`), or other glyph corruption.
+- The question is inherently visual — charts, figures, layout-dependent diagrams.
+
+Typical workflow: `toc()` or `grep()` to locate the right page → `pages(N)` for prose → `pages(N, as="image")` if the page is tabular or the text looked off. Image mode runs ~2–4× the input-token cost of text at 150 DPI, so use it as the precision step, not the default.
 
 ## Reading Google Docs
 

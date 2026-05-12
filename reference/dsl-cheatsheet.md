@@ -105,15 +105,15 @@ my-project[docs/api.md].section("API Design > Error Handling")
 
 Intermediate levels can be skipped — `section("Neural Networks > Estimation Error")` resolves even without naming every parent.
 
-**Reading PDFs:** PDFs use pages as their natural unit. `pages()` returns the most useful content per page automatically — extracted text for text pages, rendered PNG for image-only pages. Mixed PDFs decide per-page.
+**Reading PDFs:** PDFs use pages as their natural unit. `pages()` defaults to extracted text and falls back to rendered PNG for image-only pages. Override with `as="image"` for text pages whose content is tabular or visually complex — text extraction can misread multi-column layouts.
 
-| Call | What you get |
-|------|-------------|
-| `pages("1-5")` | Text or image per page (automatic) |
-| `pages("2", as="image")` | Rendered PNG regardless of text |
-| `pages("2", as="text")` | Text only (errors if unavailable) |
+| Call | Use when |
+|------|----------|
+| `pages("1-5")` | Prose, narrative notes, MD&A; locating content |
+| `pages("2", as="image")` | Multi-column tables, financial statements, charts; text shows glyph drops |
+| `pages("2", as="text")` | Forcing text on an image-only page (errors if unavailable) |
 
-`toc()` and `section()` work on PDFs with bookmarks. `grep()` searches extracted text from text pages; for image-only PDFs, `grep()` is hidden and `pages()` renders page images.
+`toc()` and `section()` work on PDFs with bookmarks. `grep()` searches extracted text from text pages; for image-only PDFs, `grep()` is hidden and `pages()` renders page images. Image mode runs ~2–4× the input-token cost of text at 150 DPI — use as a precision step, not the default.
 
 **Reading Google Docs:** Google Docs in Drive collections use paragraphs as their natural unit, with headings forming a hierarchical table of contents. Multi-tab documents expose each tab as a navigable unit.
 
