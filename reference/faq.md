@@ -1,7 +1,7 @@
 ---
 title: FAQ
 audience: users
-last_validated: 2026-04-23
+last_validated: 2026-04-24
 ---
 
 # FAQ
@@ -22,6 +22,9 @@ Lynko syncs content from your sources (GitHub, Google Drive) so agents can navig
 
 **My agent already has bash, grep, and file access. What does Lynko add?**
 Bash + grep gets you bytes. Lynko gets you *structural navigation* — the same way humans read: tables of contents, section headings, function outlines. An agent forced to rebuild these per-session (parsing PDFs with custom scripts, extracting markdown TOCs by hand, running ad-hoc AST tools) is essentially rebuilding Lynko — slowly, incompletely, and from scratch every time. Lynko ships the navigation once; every agent can use it immediately, across every content type and every source.
+
+**My agent already has a Google Drive (or GitHub, or Notion) connector. What does Lynko add?**
+Native connectors move bytes; Lynko exposes handles. A Drive connector returns a snippet or a downloaded file — and once it does, the agent is back to dumping content into context, building an ad-hoc parser, or guessing structure from headings. Lynko returns a `section("Indemnification")` handle the agent can read, edit, and act on — the same handle that names the operation also defines the scope of the edit. Connectors stop at "here's the file"; Lynko continues with "here's the function, here's the clause, here's the row range — and you can change it."
 
 **Why MCP, not a typed API like gRPC?**
 MCP is a text-in, text-out protocol. That matches how agents actually reason — they were trained on text and think in text. A rigid typed API would force the agent to translate between its natural mental model and a schema, wasting attention on protocol plumbing. MCP lets the agent stay in one mental mode. It's also the emerging standard — Claude, ChatGPT, Cursor, and most major AI clients support custom MCP connectors. Connect once, work everywhere.

@@ -1,7 +1,7 @@
 ---
 title: Lynko
 audience: users
-last_validated: 2026-04-23
+last_validated: 2026-04-24
 ---
 
 # Lynko
@@ -49,6 +49,8 @@ my-project.commit("fix: update handler and docs")                       # Commit
 **Smart resolution:** paths resolve automatically. `my-project[handler.go]` finds `src/internal/handler.go` if unique. `section("setup")` matches "Setup Guide". You can even skip the collection name — a bare path like `src/main.go` resolves to the right collection and runs your operation, as long as the file is unambiguous across your workspace.
 
 Filesystem operations (`ls`, `grep`, `find`) and scoped search (`my-project[src/].grep("pattern")`) work as you'd expect. See the [DSL cheatsheet](reference/dsl-cheatsheet.md) for the full reference.
+
+**Compared to a native connector:** A Drive or GitHub MCP connector moves bytes — your agent gets a snippet or a downloaded file, then has to dump it into context, build an ad-hoc parser, or guess structure from headings. Lynko exposes handles instead. The same operation that names a section, function, or row range also defines the edit scope. Bytes vs handles is the difference between "the file" and "the function you wanted to change."
 
 ## What's in This Repo
 
