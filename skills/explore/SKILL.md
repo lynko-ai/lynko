@@ -3,7 +3,7 @@ name: lynko-explore
 description: >
   Navigate and read content through Lynko collections — git repos, Google Drive,
   documents, PDFs. Use when browsing codebases, reading documentation, searching
-  across files, or understanding project structure.
+  across files, discovering skills in the pod, or understanding project structure.
 ---
 
 # Explore Content with Lynko
@@ -112,6 +112,13 @@ my-project[*.md].grep("TODO")               # Only .md files at root level
 my-project.grep(/error|warn/)                # Regex pattern
 ```
 
+**Semantic vs exact.** `grep()` matches exact text or regex; `search()` ranks results by *meaning* via embeddings — reach for it when you don't know the exact words:
+
+```
+my-project.search("how auth tokens are refreshed")   # Semantic; ranked by meaning
+my-project.search("retry backoff", max_results=10)    # Widen the result set
+```
+
 ## Finding Symbols
 
 Jump to definitions and trace references across a codebase:
@@ -131,6 +138,20 @@ my-project.find(*.go)                        # All .go files
 my-project.find(*.test.ts)                   # All test files
 my-project.find(*config*, type=file)         # Files matching "config"
 ```
+
+## Finding Skills
+
+The skills node surfaces qualified `SKILL.md` files across every collection in the pod as one searchable set:
+
+```
+skills.ls()                                  # All skills, grouped by collection
+skills["lynko-prompts/"].ls()                # Skills from one collection
+skills.search("write an engineering plan")   # Semantic search across all skills
+skills["lynko-prompts/"].search("eval doc")  # Search within one collection
+skills["lynko-prompts/tasks/adr-draft/SKILL.md"].info()  # One skill's details
+```
+
+In a crowded pod — hundreds of skills across many collections — a bare generic query gets out-ranked by unrelated skills. Scope to the collection, or name it in the query, to surface the one you want: `skills["lynko-prompts/"].search("code review")` or `skills.search("lynko code review")`.
 
 ## Navigation Hierarchy
 
