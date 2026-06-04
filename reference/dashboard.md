@@ -113,9 +113,11 @@ Nodes are services attached to a pod. Each node enables one or more DSL operatio
 
 New pods come with a **CI node** by default — this is what enables `test()` against your draft content. If you don't see `test()` in `artifacts()`, the CI node isn't attached to this pod.
 
-Click **+ Add Node** to add another. The form lets you choose between two node types:
+Click **+ Add Node** to add another. The form lets you choose between three node types:
 
 **CI** (`native:ci`) — no extra config. Just pick a reference name and submit. Adds `test()`.
+
+**Skills** (`native:skills`) — no extra config. Just pick a reference name (it becomes the DSL prefix, e.g. `skills.ls()`) and submit. Surfaces every qualified `SKILL.md` across the pod's collections as one searchable, curatable set — discovery (`ls`/`search`/`info`/`read`/`status`) plus per-pod curation (`pin`/`exclude`/`include`/`reset`/`curation`). Skills are indexed from committed content; a newly committed `SKILL.md` appears after the next refresh.
 
 **Runner** (`native:runner`) — adds `run()` for executing arbitrary commands on a machine you've connected over SSH. Useful for builds, smoke tests, or anything that needs to happen on a specific host. The form needs:
 

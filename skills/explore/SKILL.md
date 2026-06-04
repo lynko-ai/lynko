@@ -153,6 +153,22 @@ skills["lynko-prompts/tasks/adr-draft/SKILL.md"].info()  # One skill's details
 
 In a crowded pod — hundreds of skills across many collections — a bare generic query gets out-ranked by unrelated skills. Scope to the collection, or name it in the query, to surface the one you want: `skills["lynko-prompts/"].search("code review")` or `skills.search("lynko code review")`.
 
+### Curating Skills
+
+Discovery is shaped by per-pod curation rules — none of it touches the underlying repos:
+
+```
+skills["**/experiments/**"].exclude()        # Hide noise from ls/search (globs ok)
+skills["my-repo/ops/deploy/SKILL.md"].pin()  # Boost a go-to skill in search
+skills.search("deploy", pinned=true)         # Strict: only pinned skills
+skills["my-repo/experiments/keeper/SKILL.md"].include()  # Re-surface one path under a broader exclude
+skills.curation()                            # List every rule on this pod
+skills["**/experiments/**"].reset()          # Clear rules at a selector
+skills.status(state="excluded")              # Audit what's hidden
+```
+
+Pods start with hygiene defaults excluding `**/test/fixtures/**` and `**/testdata/**`, so fixture skills stay out of discovery from day one. Excluding never breaks reading: an excluded skill still answers `info()`/`read()` by exact path. The most specific selector wins (an exact-path `include` beats a broader `exclude`), and rules are scoped to your pod — other pods sharing the same collections are unaffected.
+
 ## Navigation Hierarchy
 
 Follow this pattern for efficient exploration:

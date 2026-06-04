@@ -305,6 +305,39 @@ During execution, `read()` / `grep()` / `lines()` query the target machine live 
 artifacts()                                  # List all collections and operations
 ```
 
+## Skills
+
+Requires a skills node attached to the pod. Every qualified `SKILL.md` (frontmatter with `name` + `description`) across your collections becomes one searchable set:
+
+```
+skills.ls()                                  # All skills, grouped by collection
+skills["my-repo/"].ls()                      # Skills from one collection
+skills.search("deploy a staging build")      # Semantic search across all skills
+skills.search("smoke test", pinned=true)     # Only pinned skills
+skills["my-repo/ops/deploy/SKILL.md"].info() # One skill's details
+skills["my-repo/ops/deploy/SKILL.md"].read() # Full SKILL.md content
+skills.status()                              # Index health + excluded count
+skills.status(state="excluded")              # List skills hidden by curation
+```
+
+Curation — per-pod rules that shape discovery without touching the underlying repos:
+
+```
+skills["my-repo/ops/deploy/SKILL.md"].pin()      # Boost in search results
+skills["my-repo/ops/deploy/SKILL.md"].unpin()    # Remove the boost
+skills["**/experiments/**"].exclude()            # Hide from ls/search (globs ok)
+skills["my-repo/experiments/keeper/SKILL.md"].include()  # Re-surface under a broader exclude
+skills["**/experiments/**"].reset()              # Clear rules at a selector (both axes)
+skills.curation()                                # List all rules on this pod
+```
+
+### Tips
+
+- Pods start with hygiene defaults that exclude `**/test/fixtures/**` and `**/testdata/**` — fixture skills won't appear in `ls()`/`search()`. Use `skills.curation()` to see the rules and `include()` to re-surface specific paths.
+- `exclude` hides skills from discovery only — an excluded skill still reads fine by exact path (`info()`/`read()`).
+- The most specific selector wins; an exact-path `include` beats a broader `exclude`. Write responses report how many skills actually flipped visibility.
+- Rules are per-pod: curating here never affects other pods sharing the same collections.
+
 ## Glob Patterns
 
 | Pattern | Matches | Example |

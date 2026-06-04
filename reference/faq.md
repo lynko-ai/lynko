@@ -70,6 +70,15 @@ No. On writable collections, `run()` automatically checkpoints your drafts to a 
 **My `run()` output is long — how do I read it efficiently?**
 Use `runner["run-id"].status()` for the summary, `runner["run-id"].lines("N-M")` for specific ranges, and `runner["run-id"].grep("pattern")` to search. Reserve `read()` for short output — `read()` returns the full captured log and has no range parameter. Very long outputs are bounded at ~10MB (head+tail split past the limit) — if you need the middle, scope the command to produce less output or redirect to a file on the target and read it with a follow-up run.
 
+**Why don't some skills show up in `skills.ls()` or `skills.search()`?**
+Pods come with hygiene defaults that exclude `**/test/fixtures/**` and `**/testdata/**` from discovery, and you (or an agent) may have added curation rules. Run `skills.curation()` to see every rule on the pod. Re-surface a path with `skills["path"].include()` — an exact-path include wins over a broader exclude — or clear a rule with `reset()`. Exclusion affects `ls()`/`search()` only: any skill still reads by exact path. `skills.status(state="excluded")` lists everything currently hidden.
+
+**What makes a file a skill?**
+A `SKILL.md` file with frontmatter containing a `name` and a `description`. Qualification is checked when the commit lands — the commit response tells you when a file newly qualifies — and the skill appears in `skills.search()` after the next refresh.
+
+**Why doesn't the `skills` surface show up in `artifacts()`?**
+The skills node isn't attached to this pod. It's opt-in — add it from the dashboard (Pods → Nodes → + Add Node), pick a reference name, and the discovery and curation operations appear.
+
 ## Troubleshooting
 
 **"No artifacts found" after connecting**
