@@ -1,12 +1,14 @@
 ---
 title: Lynko
 audience: users
-last_validated: 2026-04-24
+last_validated: 2026-06-05
 ---
 
 # Lynko
 
-The cognitive layer for AI agents. Connect your content once; any agent can navigate, edit, and act on it through one DSL — git repos, Google Drive, PDFs, spreadsheets, and more.
+Connect your content once — any AI agent can read, edit, test, and commit across your repos, docs, PDFs, and spreadsheets through structural handles, not file dumps.
+
+Lynko is the cognitive layer between agents and your content: the section, function, or row an agent navigates to is also the scope it can safely edit.
 
 ## Quick Start
 
@@ -16,9 +18,11 @@ The cognitive layer for AI agents. Connect your content once; any agent can navi
 
 ## What Makes It Different
 
-Lynko gives agents **content-intelligent navigation** — not just file access, but structure-aware operations that match how content is naturally organized.
+Four things, in the order you'll meet them.
 
-**Code:** understand structure without reading entire files.
+**1. Handles, not file dumps.** Content-intelligent navigation — structure-aware operations that match how content is naturally organized.
+
+Code: understand structure without reading entire files.
 
 ```
 my-project[src/server.go].outline()          # Types, functions, signatures
@@ -27,7 +31,7 @@ my-project.find_definition("UserService")    # Jump to definition
 my-project.find_references("UserService")    # Trace all usages
 ```
 
-**Docs, PDFs, and spreadsheets:** navigate by structure, not by scrolling.
+Docs, PDFs, and spreadsheets: navigate by structure, not by scrolling.
 
 ```
 my-project[docs/guide.md].toc()                          # Table of contents
@@ -37,14 +41,23 @@ my-contracts[msa-2026.pdf].section("Indemnification")    # Jump to one clause in
 my-finance[q1-forecast.gsheet].sheets()                  # List spreadsheet tabs
 ```
 
-**Edit where you navigate:** the same operation that reads content also defines the edit scope.
+**2. Safe, scoped edits.** The same operation that reads content also defines the edit scope. Versioning and rollback come from git — mechanisms your team already trusts; Lynko adds the scoping, the draft workflow, and the audit trail on top.
 
 ```
 my-project[src/server.go].expand("Handler").draft.edit("old", "new")   # Scoped to one function
 my-project[docs/guide.md].section("Setup").draft.edit("old", "new")    # Scoped to one section
 my-project.diff()                                                       # Review changes
-my-project.commit("fix: update handler and docs")                       # Commit and push
 ```
+
+**3. The full loop.** Edit → test → commit, one grammar. A CI node runs tests against your drafts before anything lands; a runner node executes commands on your machines. Every new node adds a verb to the same grammar.
+
+```
+my-project.test(targets="api")                  # CI runs against draft state
+ci["run-20260605-..."].grep("FAIL")             # Inspect results — the run is a handle too
+my-project.commit("fix: update handler and docs")  # Publish
+```
+
+**4. A workspace that keeps state.** Your pod is a working copy of your content universe: drafts persist across sessions, reads see draft state, and per-pod curation (like pinning your go-to skills) shapes what agents discover — without touching the underlying repos.
 
 **Smart resolution:** paths resolve automatically. `my-project[handler.go]` finds `src/internal/handler.go` if unique. `section("setup")` matches "Setup Guide". You can even skip the collection name — a bare path like `src/main.go` resolves to the right collection and runs your operation, as long as the file is unambiguous across your workspace.
 
