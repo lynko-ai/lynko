@@ -249,6 +249,7 @@ new content that mentions @@@@@ delimiters
 | `merge(branch)` | Merge branch into current | `my-project.merge("main")` |
 | `restore()` | Discard all drafts | `my-project.restore()` |
 | `draft.discard()` | Discard one file's draft | `my-project[file.go].draft.discard()` |
+| `whoami()` | Show this connection's role and read/write/admin access | `whoami()` |
 
 ## Testing
 

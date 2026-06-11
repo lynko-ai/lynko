@@ -18,6 +18,7 @@ Your dashboard is at [auth.lynko.ai/v1/ui/dashboard](https://auth.lynko.ai/v1/ui
 | **Credentials** | Git PATs, Google Drive connection, SSH keys for Runner nodes |
 | **Storage** | Workspace-wide artifact count, data size, and estimated context cost |
 | **Usage** | Operations, credits, and response time over 24h / 7d / 30d |
+| **Roles** | Define per-connection read/write/admin scopes for a shared pod; connect at `/as/<role>` so each agent carries only the access it needs |
 | **Active Sessions** | See and revoke OAuth sessions from connected AI clients |
 
 The dashboard is a single page — every panel below corresponds to a section on it.
