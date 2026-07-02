@@ -67,10 +67,12 @@ Once connected, your agent has access to all collections in your workspace.
 **Nodes** are services attached to your pod. Nodes control what operations are available on your collections:
 
 - **CI** (default) adds `test()` for running tests against your draft content.
-- **Runner** (opt-in, BYO machine) adds `run()` for executing arbitrary commands on a target machine you've connected over SSH — useful for builds, scripts, one-off inspections, or anything that needs to happen on a specific host.
+- **Runner** (opt-in, BYO machine) adds `run()` for executing arbitrary commands on a target machine you've connected over SSH — useful for builds, scripts, one-off inspections, or anything that needs to happen on a specific host. It also adds `invoke()` for dispatching a sub-agent (`codex` or `claude-code`) into the pod under an attenuated role.
 - **Skills** (opt-in) adds the `skills` surface: every qualified `SKILL.md` across your collections becomes one searchable set — `skills.ls()`, `skills.search("...")` — that you can curate per pod by pinning go-to skills and excluding noise.
 
 An operation only appears on a collection when the backing node is attached. If you don't see `test()`, `run()`, or the `skills` surface in `artifacts()`, the node isn't attached to this pod.
+
+**Roles** are named, pod-scoped permission sets. Your own connection is the implicit full-access `author` role; define scoped roles (like a read-only `reviewer`) in the dashboard and connect an agent at `https://mcp.lynko.ai/pods/<pod-id>/as/<role>` so it carries exactly that access — no more. `whoami()` shows what any connection can do.
 
 **Drafts** are uncommitted changes. When you edit through Lynko, changes are staged as drafts. All read operations — `read()`, `grep()`, `section()`, etc. — transparently show your draft state when one exists, otherwise committed content. Only writes use the `.draft.` prefix. Use `diff()` to compare draft vs committed, and `commit()` to save.
 

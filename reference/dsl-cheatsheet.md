@@ -146,6 +146,7 @@ Multi-sheet spreadsheets require sheet qualification for `rows()` and `cells()`.
 | `grep(pattern)` | Search file content | `my-project.grep("TODO")` |
 | `grep(pattern, context_lines=N)` | Search with context | `my-project.grep("error", context_lines=3)` |
 | `grep(/regex/)` | Regex search | `my-project.grep(/error\|warn/)` |
+| `search(query)` | Semantic search — ranked by meaning, not exact text | `my-project.search("how auth tokens are refreshed")` |
 | `find_definition(symbol)` | Find where defined | `my-project.find_definition("UserService")` |
 | `find_references(symbol)` | Find all usages | `my-project.find_references("UserService")` |
 
@@ -155,6 +156,7 @@ Multi-sheet spreadsheets require sheet qualification for `rows()` and `cells()`.
 my-project[src/].grep("pattern")             # Under a directory
 my-project[**/*.go].grep("pattern")          # Only .go files (any depth)
 my-project[*.md].grep("pattern")             # Only .md files (root level)
+my-project[docs/**/*.md].search("auth flow") # Semantic search, scoped
 ```
 
 **Which operations support scoping:**
@@ -163,11 +165,14 @@ my-project[*.md].grep("pattern")             # Only .md files (root level)
 |-----------|:-:|:-:|
 | `grep` | ✓ | ✓ |
 | `find` | ✓ | ✓ |
+| `search` | ✓ | ✓ |
 | `ls` | ✓ | — (use `find`) |
 | `find_definition` | ✓ | — (use dir scope) |
 | `find_references` | ✓ | — (use dir scope) |
 
 Scope provides defaults — explicit arguments override. For example, `my-project[docs/].ls("adr")` lists `adr/`, not `docs/adr/`.
+
+`search()` is on by default and builds its index on first use — a fresh collection may answer "building" once; retry in a moment. Tune with `max_results` and `vector_min_score` (a 0–1 similarity floor).
 
 ## Editing
 
@@ -249,7 +254,6 @@ new content that mentions @@@@@ delimiters
 | `merge(branch)` | Merge branch into current | `my-project.merge("main")` |
 | `restore()` | Discard all drafts | `my-project.restore()` |
 | `draft.discard()` | Discard one file's draft | `my-project[file.go].draft.discard()` |
-| `whoami()` | Show this connection's role and read/write/admin access | `whoami()` |
 
 ## Testing
 
@@ -338,6 +342,55 @@ skills.curation()                                # List all rules on this pod
 - `exclude` hides skills from discovery only — an excluded skill still reads fine by exact path (`info()`/`read()`).
 - The most specific selector wins; an exact-path `include` beats a broader `exclude`. Write responses report how many skills actually flipped visibility.
 - Rules are per-pod: curating here never affects other pods sharing the same collections.
+
+## Connection Roles
+
+A role is a named, pod-local permission set — read/write/admin grants over collections and paths, with write modes `none` / `append` / `full`. Every pod has the implicit full-access `author` role; define scoped roles (e.g. `reviewer`) per pod in the dashboard under **Pods → Roles**.
+
+Point an agent at a role by giving it the role's connection URL instead of the plain pod URL:
+
+```
+https://mcp.lynko.ai/pods/<pod-id>/as/<role>
+```
+
+The connection then carries only that role's access — operations outside the role don't appear in `artifacts()`, and attempts are rejected server-side. Check any connection with:
+
+```
+whoami()                                     # Role, read/write/admin, max write mode, scope summary
+```
+
+Roles are also what `invoke()` dispatches sub-agents as — see [Invoking Agents](#invoking-agents).
+
+## Invoking Agents
+
+`invoke()` dispatches a **sub-agent** into the collection's pod — the agent-to-agent sibling of `run()` and `test()`. The chosen agent driver runs your prompt under a role you pick, scoped to be **no more powerful than your own** connection. Canonical use: have a sub-agent review your own diff.
+
+```
+my-project.invoke("claude-code", "reviewer", "Review the diff on this branch and flag risky changes")
+my-project.invoke("codex", "reviewer", "Summarize what changed and call out anything Tier 3", timeout="10m")
+```
+
+| Argument | What it is |
+|----------|------------|
+| `agent` | The driver to launch: `codex` or `claude-code`. |
+| `as` | A **concrete role** the sub-agent runs as (e.g. `reviewer`) — see [Connection Roles](#connection-roles). Its authority is attenuated to a subset of yours — never the full / `author` role. |
+| `prompt` | The instruction handed to the sub-agent. |
+| `timeout` | Optional. Go duration (`"30s"`, `"10m"`, `"1h"`); the sub-agent is run-bounded and capped at 1h. |
+
+Positionals bind in order (`agent`, `as`, `prompt`, `timeout`); named args must come after any positionals — `invoke("codex", "reviewer", "…", timeout="30m")` or fully named `invoke(agent="codex", as="reviewer", prompt="…")`. A named arg before a positional mis-binds. For multi-line prompts, pass a `@@@@@` raw string.
+
+`invoke()` returns immediately with a run ID — the invocation is a normal runner run. Observe it through the same `runner[...]` surface as `run()`:
+
+```
+runner.status()                              # Active runs + installed_agents (which drivers are available)
+runner["run-ID"].status()                    # State, duration, exit code
+runner["run-ID"].read()                      # Full sub-agent output
+runner["run-ID"].lines("1-50")               # Head of output (range)
+runner["run-ID"].grep("FAIL", context_lines=3)   # Search the sub-agent's output
+runner["run-ID"].cancel()                    # Terminate the sub-agent
+```
+
+The sub-agent runs **attenuated** to `as`, **non-chaining** (it cannot itself `invoke()` another agent), and **run-bounded** (it terminates with the run). It already knows where it is: an invocation context block naming its collection and role is prepended to your prompt, so spend the prompt on the task, not orientation. Check `runner.status()` → `installed_agents` to see which drivers the pod has available before invoking.
 
 ## Glob Patterns
 

@@ -20,6 +20,9 @@ Git repositories (public and private) and Google Drive folders. PDF documents, m
 **Is my data safe?**
 Lynko syncs content from your sources (GitHub, Google Drive) so agents can navigate it. Your original data remains under your control in its source platform. All access is authenticated through your account and scoped to your workspace.
 
+**How do I give an agent limited access — say, read-only?**
+Define a scoped role on the pod (dashboard → your pod's **Roles** button): a named set of read/write/admin grants over collections and paths. Then point that agent at the role's connection URL — `https://mcp.lynko.ai/pods/<pod-id>/as/<role>` — instead of the plain pod URL. The connection carries only what the role grants: operations outside it don't appear in `artifacts()`, and attempts are rejected server-side. Verify with `whoami()`. The same roles are what `invoke()` dispatches sub-agents as.
+
 **My agent already has bash, grep, and file access. What does Lynko add?**
 Bash + grep gets you bytes. Lynko gets you *structural navigation* — the same way humans read: tables of contents, section headings, function outlines. An agent forced to rebuild these per-session (parsing PDFs with custom scripts, extracting markdown TOCs by hand, running ad-hoc AST tools) is essentially rebuilding Lynko — slowly, incompletely, and from scratch every time. Lynko ships the navigation once; every agent can use it immediately, across every content type and every source.
 
@@ -66,6 +69,9 @@ Drafts are scoped to your pod. Multiple agents using the same pod share draft st
 
 **Do I need to commit before running `run()`?**
 No. On writable collections, `run()` automatically checkpoints your drafts to a system branch before dispatching, so the machine sees your in-progress changes. When there are no drafts, `run()` uses a fast path and runs against the latest committed state — this works on both writable and public/read-only collections. Drafts on a read-only collection are rejected with `RUNNER_ERROR_CANNOT_CHECKPOINT` since there's no remote to push the checkpoint to.
+
+**What's `invoke()` and how is it different from `run()`?**
+`run()` executes a shell command; `invoke()` launches a whole sub-agent (`codex` or `claude-code`) inside the pod under a role you pick — always a subset of your own authority, never the full `author` role. The sub-agent can't `invoke()` further (non-chaining) and terminates with its run (capped at 1h). Dispatch with `my-project.invoke("codex", "reviewer", "…")`, then read its output like any run: `runner["run-ID"].read()`. Requires a runner node with the agent installed — check `runner.status()` → `installed_agents`.
 
 **My `run()` output is long — how do I read it efficiently?**
 Use `runner["run-id"].status()` for the summary, `runner["run-id"].lines("N-M")` for specific ranges, and `runner["run-id"].grep("pattern")` to search. Reserve `read()` for short output — `read()` returns the full captured log and has no range parameter. Very long outputs are bounded at ~10MB (head+tail split past the limit) — if you need the middle, scope the command to produce less output or redirect to a file on the target and read it with a follow-up run.

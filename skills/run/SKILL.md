@@ -38,11 +38,11 @@ If `runner.status()` fails with "node not attached," the runner isn't on this po
 
 ```
 my-project.run("go build ./...")
-# → Run dispatched: run-20260417T1145-abc1
-#   Check: runner["run-20260417T1145-abc1"].status()
+# → Run dispatched: run_7c9e4f21a3b8d05612ef9a34c1d2b7e0
+#   Check: runner["run_7c9e4f21a3b8d05612ef9a34c1d2b7e0"].status()
 
 # Wait a bit (seconds for fast commands, minutes for builds)
-runner["run-20260417T1145-abc1"].status()
+runner["run_7c9e4f21a3b8d05612ef9a34c1d2b7e0"].status()
 # → status=succeeded, exit_code=0, duration=12s
 ```
 

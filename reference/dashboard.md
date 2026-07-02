@@ -114,11 +114,13 @@ Nodes are services attached to a pod. Each node enables one or more DSL operatio
 
 New pods come with a **CI node** by default — this is what enables `test()` against your draft content. If you don't see `test()` in `artifacts()`, the CI node isn't attached to this pod.
 
-Click **+ Add Node** to add another. The form lets you choose between three node types:
+Click **+ Add Node** to add another. The form lets you choose between four node types:
 
 **CI** (`native:ci`) — no extra config. Just pick a reference name and submit. Adds `test()`.
 
 **Skills** (`native:skills`) — no extra config. Just pick a reference name (it becomes the DSL prefix, e.g. `skills.ls()`) and submit. Surfaces every qualified `SKILL.md` across the pod's collections as one searchable, curatable set — discovery (`ls`/`search`/`info`/`read`/`status`) plus per-pod curation (`pin`/`exclude`/`include`/`reset`/`curation`). Skills are indexed from committed content; a newly committed `SKILL.md` appears after the next refresh.
+
+**Embedding** (`native:embedding`) — no extra config. Powers semantic `search()` on the pod's collections; the index builds automatically on the first search.
 
 **Runner** (`native:runner`) — adds `run()` for executing arbitrary commands on a machine you've connected over SSH. Useful for builds, smoke tests, or anything that needs to happen on a specific host. The form needs:
 
@@ -133,6 +135,19 @@ Click **+ Add Node** to add another. The form lets you choose between three node
 Runner rows in the Nodes table are expandable — click to see the configured machines (name, host, user, credential, work dir).
 
 Remove a node with **remove** in its row. Confirmation is shown for runners since this drops machine config.
+
+### Roles
+
+Each pod row has a **Roles** button — scoped connection roles for that pod: named, additive read/write/admin scopes an agent can connect as, instead of your full-access `author` identity.
+
+The roles table lists each role's capabilities, scope version, and connection URL (`…/pods/<pod-id>/as/<role>`); the implicit `author` role is shown read-only. To create a role, pick a name (1–64 chars: letters, digits, `-`, `_`; `author` and `owner` are reserved) and add grant rows:
+
+- **Class** — `read`, `write`, or `admin`
+- **Write mode** — for write grants: `none`, `append` (may only extend existing content), or `full`
+- **Selector** — a specific collection, or a glob (dynamic: also matches collections added to the pod later)
+- **Paths** (optional) — restrict the grant to paths within the selector
+
+Template buttons pre-fill a role name and grant set to start from. Deleting a role requires typing its name to confirm and revokes every credential issued for it.
 
 ## Credentials
 
