@@ -49,7 +49,7 @@ my-project[docs/guide.md].section("Setup").draft.edit("old", "new")    # Scoped 
 my-project.diff()                                                       # Review changes
 ```
 
-**3. The full loop.** Edit → test → commit, one grammar. A CI node runs tests against your drafts before anything lands; a runner node executes commands on your machines. Every new node adds a verb to the same grammar.
+**3. The full loop.** Edit → test → commit, one grammar. A CI node runs tests against your drafts before anything lands; a runner node executes commands on your machines. Your collections are the nouns; every new node adds a verb to the same grammar.
 
 ```
 my-project.test(targets="api")                  # CI runs against draft state
