@@ -8,7 +8,7 @@ last_validated: 2026-06-05
 
 Connect your content once — any AI agent can read, edit, test, and commit across your repos, docs, PDFs, and spreadsheets through structural handles, not file dumps.
 
-Lynko is the cognitive layer between agents and your content: the section, function, or row an agent navigates to is also the scope it can safely edit.
+Lynko is the layer between agents and your content: the section, function, row, or run an agent navigates to is also the scope it can safely edit, test, and resume from.
 
 ## Quick Start
 

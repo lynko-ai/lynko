@@ -91,7 +91,7 @@ The skills node isn't attached to this pod. It's opt-in — add it from the dash
 Make sure you've added at least one collection in your dashboard and it has finished syncing. Run `artifacts()` to see what's available.
 
 **MCP connection fails**
-Verify the URL is exactly `https://mcp.lynko.ai/` (with trailing slash). For Claude, ensure the Client ID and Client Secret are set correctly under Advanced Settings.
+Verify the URL is exactly `https://mcp.lynko.ai/` (with trailing slash).
 
 **Operation returns "not found"**
 Check the file path. Use `ls()` to see available files, or `find(*pattern*)` to search. Paths are case-sensitive.

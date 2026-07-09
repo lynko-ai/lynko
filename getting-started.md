@@ -44,15 +44,9 @@ Add a custom MCP connector in your AI client with this URL:
 
 **URL:** `https://mcp.lynko.ai/`
 
-**Most MCP clients (ChatGPT, Codex, etc.):** just the URL is enough. These clients handle registration automatically.
+Just the URL is enough — clients register automatically via dynamic client registration; no Client ID or Secret is needed.
 
-**Claude Desktop / Claude.ai:** Claude requires a Client ID and Client Secret because it doesn't support automatic registration. Under Advanced Settings, set:
-- Client ID: `claude-browser`
-- Client Secret: `claude_browser_secret`
-
-These are public client identifiers for the OAuth flow, not private credentials. Your account security relies on the OAuth login, not these values.
-
-Tested with Claude Desktop, Claude.ai, and ChatGPT. Other MCP-compatible clients should work — [let us know](../../issues/new/choose) if you hit issues.
+Tested with Claude Desktop, Claude.ai, ChatGPT, Codex, Cursor, Grok, and Figma. Other MCP-compatible clients should work — [let us know](../../issues/new/choose) if you hit issues.
 
 Once connected, your agent has access to all collections in your workspace.
 
