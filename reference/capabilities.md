@@ -13,7 +13,7 @@ What each collection type, content type, and node supports today.
 | Git — snapshot | — | — | — |
 | Google Drive | `pull()` | Coming soon | Coming soon |
 
-Git snapshots are navigable but expose no `pull()`, drafts, or commit. Drive draft/write-back is in active implementation and lands soon; until then Drive collections are read + navigate.
+Snapshots: navigation only.
 
 ## Content navigation
 
@@ -25,16 +25,18 @@ Git snapshots are navigable but expose no `pull()`, drafts, or commit. Drive dra
 | Google Docs | `toc()` · `section()` · `paragraphs()` · `tab()` | `tab()` for multi-tab documents |
 | Google Sheets | `sheets()` · `rows()` · `cells()` · `grep()` | — |
 
-`read()`, `grep()`, `find()`, `ls()`, and `tree()` are available across collections and content, subject to the same conditions. Drive `grep()` searches materialized, navigable content and skips catalog-only entries. Structural PDF editing is not part of the current text DSL — PDF is navigate-only today regardless of the containing collection.
+Collections expose `ls()`, `find()`, and — when hierarchical — `tree()`. Files expose `read()` plus their type-specific operations. `grep()` works where text is extractable or materialized. PDF is navigate-only today, regardless of the containing collection.
 
 ## Optional nodes
 
 | Node | Verb | Prerequisites |
 |---|---|---|
 | Embedding | `search()` | node attached; qualifying content; index builds on first use |
-| CI | `test()` | node attached; pushable remote Git collection; targets come from your CI configuration |
-| Runner | `run()` | node attached; machine registered |
-| Runner | `invoke()` | node attached; requested agent installed; a concrete delegable role — `author`/`full` cannot be a delegation target, and the sub-agent's scope is always a subset of your connection's |
+| CI | `test()` | pushable remote git collection · node attached · targets from CI config |
+| Runner | `run()` | remote git collection · node attached · machine registered¹ |
+| Runner | `invoke()` | remote git collection · node attached · agent installed · a delegable role (`author`/`full` excluded; sub-agent scope ⊆ yours)¹ |
 | Skills | `skills.search()` · read · pin · curate | node attached; qualified committed `SKILL.md` files |
+
+¹ Read-only remotes: no-draft fast path; drafts without push access are rejected at dispatch.
 
 Collections and content are the nouns; nodes add the verbs — and every verb acts at the scope the handle names.

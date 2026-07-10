@@ -50,7 +50,7 @@ Tested with Claude Desktop, Claude.ai, ChatGPT, Codex, Cursor, Grok, and Figma. 
 
 For exactly what each source, content type, and node supports today, see the [capability reference](reference/capabilities.md).
 
-Once connected, your agent has access to all collections in your workspace.
+Once connected, your agent sees the collections and nodes your pod and role expose.
 
 ## 4. Core Concepts
 
