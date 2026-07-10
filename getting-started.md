@@ -48,6 +48,8 @@ Just the URL is enough — clients register automatically via dynamic client reg
 
 Tested with Claude Desktop, Claude.ai, ChatGPT, Codex, Cursor, Grok, and Figma. Other MCP-compatible clients should work — [let us know](../../issues/new/choose) if you hit issues.
 
+For exactly what each source, content type, and node supports today, see the [capability reference](reference/capabilities.md).
+
 Once connected, your agent has access to all collections in your workspace.
 
 ## 4. Core Concepts
