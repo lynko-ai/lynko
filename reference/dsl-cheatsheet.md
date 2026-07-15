@@ -1,7 +1,7 @@
 ---
 title: Lynko DSL Cheatsheet
 audience: users
-last_validated: 2026-04-23
+last_validated: 2026-07-14
 ---
 
 # Lynko DSL Cheatsheet
@@ -289,8 +289,7 @@ my-project.run("./deploy.sh", machine="prod", timeout="10m")   # Pick a machine,
 
 ```
 runner.status()                              # Configured machines + active runs
-runner.history()                             # Recent runs (newest first)
-runner["run-ID"].status()                    # One run: state, duration, exit code
+runner.history()                             # Recent runs + state and duration (newest first)
 runner["run-ID"].read()                      # Full captured output
 runner["run-ID"].lines("1-50")               # Head of output (range)
 runner["run-ID"].lines("100-120")            # Specific line range
@@ -304,7 +303,7 @@ During execution, `read()` / `grep()` / `lines()` query the target machine live 
 
 - Combine with the full DSL: `my-project[src/server.go].draft.edit(...)` → `my-project.test(...)` → `my-project.run("./smoke.sh")` all run against your current drafts on writable collections.
 - Two execution paths: with drafts → checkpoint to a system branch, push, target fetches checkpoint; without drafts → fast path, target fetches the tracked branch directly. Drafts on a read-only collection (no push access) are rejected with `RUNNER_ERROR_CANNOT_CHECKPOINT`.
-- Long-running commands survive client disconnects — the run continues on the machine (via tmux), and `runner["run-ID"].status()` reports final state when it finishes.
+- Long-running commands survive client disconnects — the run continues on the machine (via tmux). Use `runner.status()` while it is active and `runner.history()` for its final state and duration.
 
 ```
 artifacts()                                  # List all collections and operations
@@ -383,7 +382,7 @@ Positionals bind in order (`agent`, `as`, `prompt`, `timeout`); named args must 
 
 ```
 runner.status()                              # Active runs + installed_agents (which drivers are available)
-runner["run-ID"].status()                    # State, duration, exit code
+runner.history()                             # Recent runs + final state and duration
 runner["run-ID"].read()                      # Full sub-agent output
 runner["run-ID"].lines("1-50")               # Head of output (range)
 runner["run-ID"].grep("FAIL", context_lines=3)   # Search the sub-agent's output

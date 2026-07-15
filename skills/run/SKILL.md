@@ -25,7 +25,7 @@ Start by checking what's available:
 
 ```
 runner.status()                              # Configured machines + active runs
-runner.history()                             # Recent runs (newest first)
+runner.history()                             # Recent runs + state and duration (newest first)
 ```
 
 If `runner.status()` fails with "node not attached," the runner isn't on this pod yet. If it succeeds but lists zero machines, attach one from the dashboard.
@@ -34,30 +34,28 @@ If `runner.status()` fails with "node not attached," the runner isn't on this po
 
 ## Dispatch and Poll
 
-`run()` returns immediately with a run ID. Poll until terminal state before reading results:
+`run()` returns immediately with a run ID. Use the runner surface for state and the run selector for output:
 
 ```
 my-project.run("go build ./...")
 # → Run dispatched: run_7c9e4f21a3b8d05612ef9a34c1d2b7e0
-#   Check: runner["run_7c9e4f21a3b8d05612ef9a34c1d2b7e0"].status()
 
-# Wait a bit (seconds for fast commands, minutes for builds)
-runner["run_7c9e4f21a3b8d05612ef9a34c1d2b7e0"].status()
-# → status=succeeded, exit_code=0, duration=12s
+runner.status()                              # Configured machines + active runs
+runner.history(limit=10)                    # Recent runs + state and duration
+runner["run_7c9e4f21a3b8d05612ef9a34c1d2b7e0"].read()   # Captured output
 ```
 
-Terminal states: `succeeded`, `failed`, `canceled`. Anything else means still running.
+Terminal states in `runner.history()` are `succeeded`, `failed`, and `canceled`. A listed `running` run is still active.
 
-`run()` is dispatched from any writable collection (`my-project.run(...)`), but the run is queryable through the global `runner[]` accessor (`runner["run-ID"].status()`). These reference the same execution — collection scope is the dispatch context, `runner[]` is the read interface.
+`run()` is dispatched from a collection (`my-project.run(...)`). The collection is the dispatch context; `runner.status()` and `runner.history()` report execution state, while `runner["run-ID"]` exposes output and cancellation.
 
-**LLM-client polling pattern.** Most LLM clients (Claude, ChatGPT, Cursor, etc.) timeout tool calls at ~25 seconds, which is much shorter than typical build/test runs. The standard pattern is: dispatch with `run()`, then issue a separate `bash sleep N` (10-60s depending on expected duration) before calling `status()`. Don't try to block inside a single tool call — the client will time out before the runner finishes.
+**LLM-client polling pattern.** Most LLM clients time out tool calls sooner than a typical build finishes. Dispatch first, then check `runner.history()` in a separate call after a reasonable interval. Do not busy-poll or try to block inside the dispatch call.
 
 ## Reading Output
 
 Navigate output top-down — prefer `grep` and `lines` over full `read()` for long output:
 
 ```
-runner["run-ID"].status()                    # Summary: state, exit code, duration, line count
 runner["run-ID"].read()                      # Full captured output
 runner["run-ID"].lines("1-50")               # First 50 lines (use lines() for ranges, not read())
 runner["run-ID"].lines("100-120")            # Specific line range
@@ -99,8 +97,8 @@ my-project[src/server.go].expand("Handler").draft.edit("old", "new")
 # 2. Dispatch a build/smoke check against drafts
 my-project.run("go build ./... && ./bin/smoke-test")
 
-# 3. Poll (sleep a few seconds between checks for fast commands)
-runner["run-ID"].status()
+# 3. Check state after a reasonable interval
+runner.history(limit=10)
 
 # 4. When done — review output
 runner["run-ID"].grep("FAIL|ERROR", context_lines=3)   # Look for problems
@@ -121,7 +119,7 @@ my-project.commit("feat(handler): ...")
 ## Tips
 
 - Concurrent runs: one command per machine at a time. Dispatching a second run while the first is active returns a `RunInProgress` error with the active run ID — check or cancel it first.
-- Long-running commands survive client disconnects. The run continues on the machine (via tmux); `runner["run-ID"].status()` reports the final state when the command finishes.
+- Long-running commands survive client disconnects. The run continues on the machine (via tmux); `runner.history()` reports its final state and duration.
 - `runner.history()` paginates — the output includes the cursor for the next page.
 - Captured output is bounded at ~10MB (head+tail split past the limit, with a `--- OUTPUT TRUNCATED ---` marker between the halves). `read()`, `grep()`, and `lines()` all operate on the captured output; if truncation loses something you need, scope the command to produce less output or redirect to a file on the target and read it with a follow-up run.
 - For multi-line scripts with complex escapes (Python heredocs, embedded quotes, `\n` in strings), prefer writing the script to `/tmp/` first and executing by path, rather than passing the script inline. Pattern: `cat > /tmp/foo.py << 'EOF' ... EOF && python3 /tmp/foo.py`. Inline heredocs occasionally trip the output-capture path on short-lived commands; the file-on-disk path is robust. `/tmp/` persists across runs on the same machine.
