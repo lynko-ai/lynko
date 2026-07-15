@@ -1,14 +1,14 @@
 ---
 title: Lynko
 audience: users
-last_validated: 2026-06-05
+last_validated: 2026-07-14
 ---
 
 # Lynko
 
-Connect your content once — any AI agent can read, edit, test, and commit across your repos, docs, PDFs, and spreadsheets through structural handles, not file dumps.
+Connect your content once. Any connected agent can navigate your repos, docs, PDFs, and sheets through structural handles — the section, function, row, or run — not file dumps. On writable sources, authorized agents use the same surface to edit, test, and commit.
 
-Lynko is the layer between agents and your content: the section, function, row, or run an agent navigates to is also the scope it can safely edit, test, and resume from.
+Lynko keeps shared working state addressable. Each agent assembles the context it needs from the same handles; drafts, runs, and results persist across sessions and harnesses, so the next agent resumes without rebuilding a transcript. Roles determine what an agent may do, and the server enforces those permissions on every call.
 
 ## Quick Start
 
