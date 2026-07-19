@@ -16,8 +16,8 @@ Your dashboard is at [auth.lynko.ai/v1/ui/dashboard](https://auth.lynko.ai/v1/ui
 | **Collections** | Add and remove git repos and Google Drive folders; check sync status |
 | **Pods** | Group collections into workspaces; manage nodes (CI, Runner); rotate keys |
 | **Credentials** | Git PATs, Google Drive connection, SSH keys for Runner nodes |
-| **Storage** | Workspace-wide artifact count, data size, and estimated context cost |
-| **Usage** | Operations, credits, and response time over 24h / 7d / 30d |
+| **Storage** | Workspace-wide artifact count, content size, and estimated context cost |
+| **Usage** | Operations, tokens, and response time over 24h / 7d / 30d |
 | **Roles** | Define per-connection read/write/admin scopes for a shared pod; connect at `/as/<role>` so each agent carries only the access it needs |
 | **Active Sessions** | See and revoke OAuth sessions from connected AI clients |
 
@@ -187,17 +187,17 @@ The dashboard never shows private key contents back — only the masked preview.
 Workspace-wide totals across all pods:
 
 - **Artifacts** — count of artifacts you own
-- **Data Size** — total bytes pulled and stored
+- **Content Size** — total bytes pulled and stored
 - **Est. Content Tokens** — approximate LLM context cost if all content were loaded. Useful for sizing what you've made available to agents.
 
 Per-pod numbers appear inside each pod card.
 
 ## Usage panel
 
-Operations, credits, and response time over a chosen window. Use the **24h / 7d / 30d** buttons to switch windows.
+Operations, tokens, and response time over a chosen window. Use the **24h / 7d / 30d** buttons to switch windows.
 
 - **Operations** — total DSL operation calls. If any failed, an `(N errors)` count appears in red next to it.
-- **Credits** — credits consumed in the window, with a usage meter underneath.
+- **Tokens** — tokens processed in the window.
 - **Response Time** — typical operation latency (when reported).
 - **Per-pod table** — same metrics broken down by pod.
 
