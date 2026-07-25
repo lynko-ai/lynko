@@ -14,7 +14,7 @@ Lynko keeps shared working state addressable. Each agent assembles the context i
 
 1. **Sign up** at [auth.lynko.ai](https://auth.lynko.ai/v1/ui/auth/signup) (invite required during [early access](reference/early-access.md))
 2. **Add a data source** — connect a git repo or Google Drive folder from your dashboard
-3. **Connect your AI client** — add a custom MCP connector with `https://mcp.lynko.ai/`
+3. **Connect your AI client** — add a custom MCP connector with `https://mcp.lynko.ai/mcp`
 
 ## What Makes It Different
 
@@ -115,5 +115,5 @@ Lynko's full privacy policy is at [auth.lynko.ai/v1/ui/auth/privacy](https://aut
 ## Links
 
 - **Dashboard**: [auth.lynko.ai](https://auth.lynko.ai/v1/ui/dashboard)
-- **MCP endpoint**: `https://mcp.lynko.ai/`
+- **MCP endpoint**: `https://mcp.lynko.ai/mcp`
 - **Agent Skills standard**: [agentskills.io](https://agentskills.io)

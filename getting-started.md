@@ -42,7 +42,7 @@ Your collections appear in the Collections panel once synced.
 
 Add a custom MCP connector in your AI client with this URL:
 
-**URL:** `https://mcp.lynko.ai/`
+**URL:** `https://mcp.lynko.ai/mcp`
 
 Just the URL is enough — clients register automatically via dynamic client registration; no Client ID or Secret is needed.
 

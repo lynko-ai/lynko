@@ -34,9 +34,7 @@ A collapsible checklist that tracks first-run setup. Items tick green as you com
 
 The panel also shows two things you'll want at hand:
 
-**MCP connector URL.** A copy-to-clipboard box with `https://mcp.lynko.ai/`. Paste this into your AI client's custom MCP connector field — clients register automatically via dynamic client registration, so the URL is all you need.
-
-The panel still shows legacy Claude Advanced-Settings values (Client ID `claude-browser`, Client Secret `claude_browser_secret`). These are public identifiers, not private credentials, and current Claude builds no longer need them.
+**MCP connector URL.** A copy-to-clipboard box with `https://mcp.lynko.ai/mcp`. Paste this into your AI client's custom MCP connector field — clients register automatically via dynamic client registration, so the URL is all you need.
 
 **Add the onboarding repo.** A one-click **+ Add** button that adds `https://github.com/lynko-ai/lynko` to your default pod. This is the repo you're reading right now — adding it lets your agent navigate the guides, FAQ, and skills the same way it navigates your own content.
 
