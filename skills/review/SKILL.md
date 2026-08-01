@@ -110,6 +110,20 @@ Low-blast-radius mechanical changes:
 
 `status()` + `diff()` sufficient. Skip the full checklist unless the diff reveals surprises.
 
+### Tier 3+ — owner decisions, outside the review's authority
+
+Some findings are not changes to approve or reject — they are decisions reserved to the plan's owner. A review may surface, price, and recommend; it may not rule. Escalate rather than decide when a finding implies:
+
+- **Scope change:** reducing, closing, splitting, or re-sequencing a plan's phases.
+- **Gate change:** setting, raising, or waiving a budget cap, tripwire, or stated stop.
+- **Criteria change:** treating a phase as done while its success criteria are unmet.
+- **Contract change:** altering approved invariants, wire shapes, or refusal semantics.
+- **Record change:** marking issues resolved, or closing a carried obligation that was not discharged.
+
+Report as **"OWNER DECISION — <the decision>, options and prices"**, and leave the plan's state open. A review that resolves one of these has exceeded its authority even when its reasoning is correct.
+
+**Silence does not delegate.** An unanswered question, an interrupt, or "continue" authorizes further work — never a decision in this class. Where the owner has not ruled, do the work that does not depend on the ruling and re-surface the question; never pick the option that unblocks the review.
+
 ### Classification caveat — path beats content
 
 If a change appears mechanical but touches a Tier 3 path (a "formatting" change in `auth/middleware.go`, a "comment update" in a migration file), treat as Tier 3. **Path signal overrides content signal.** Agents reviewing their own previous edits are the most vulnerable to this — a change that looks cosmetic on diff may have non-cosmetic effect in a security-sensitive path. When in doubt, escalate.
