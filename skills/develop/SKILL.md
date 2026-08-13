@@ -92,6 +92,8 @@ my-project.diff()                            # Final review
 my-project.commit("feat(auth): add token refresh")
 ```
 
+`commit()` pushes as part of the call. If it errors but `log()` shows your commit, the push half failed (remote-side): do not re-commit — reads will serve pre-commit content and a re-commit of the same paths is refused as base-conflicted, while `pull()` won't help (origin is behind, not ahead). Run `push()` to complete it.
+
 ## Merging Branches
 
 `merge("branch")` merges the named branch INTO your current branch. Conflicts become drafts:

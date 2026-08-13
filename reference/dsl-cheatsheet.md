@@ -1,7 +1,7 @@
 ---
 title: Lynko DSL Cheatsheet
 audience: users
-last_validated: 2026-07-14
+last_validated: 2026-08-13
 ---
 
 # Lynko DSL Cheatsheet
@@ -246,6 +246,7 @@ new content that mentions @@@@@ delimiters
 | `status()` | Show pending drafts | `my-project.status()` |
 | `diff()` | Show all changes | `my-project.diff()` |
 | `commit(message)` | Commit and push | `my-project.commit("feat: add auth")` |
+| `push()` | Rescue only: complete a commit whose push half failed | `my-project.push()` |
 | `log(max?)` | Commit history | `my-project.log(max=20)` |
 | `log(commit=hash)` | One commit's full message | `my-project.log(commit="abc1234")` |
 | `compare(base)` | Stat summary vs branch | `my-project.compare(base=main)` |
@@ -254,6 +255,8 @@ new content that mentions @@@@@ delimiters
 | `merge(branch)` | Merge branch into current | `my-project.merge("main")` |
 | `restore()` | Discard all drafts | `my-project.restore()` |
 | `draft.discard()` | Discard one file's draft | `my-project[file.go].draft.discard()` |
+
+**`push()` is a rescue, not a step.** `commit()` already pushes. If a `commit()` call errors but `log()` shows the commit, the commit landed and its push half failed (a remote-side failure): reads then serve pre-commit content for the affected paths, a later `commit()` touching them is refused with "path(s) changed on the branch since your draft was authored", and `pull()` is a no-op because origin is behind, not ahead. Confirm with `log()` and `compare(base=<origin tip>)`, then run `push()`.
 
 ## Testing
 
