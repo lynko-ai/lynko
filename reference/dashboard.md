@@ -6,7 +6,7 @@ last_validated: 2026-04-29
 
 # Dashboard
 
-Your dashboard is at [auth.lynko.ai/v1/ui/dashboard](https://auth.lynko.ai/v1/ui/dashboard). It's the one place you manage everything that backs your agent's view of Lynko: data sources, workspaces, credentials, and usage.
+Your dashboard is at [auth.lynko.ai/v1/ui/dashboard](https://auth.lynko.ai/v1/ui/dashboard). It's the one place you manage everything that backs your agent's view of Lynko: data sources, shared agent environments, credentials, and usage.
 
 ## What you can do
 
@@ -14,7 +14,7 @@ Your dashboard is at [auth.lynko.ai/v1/ui/dashboard](https://auth.lynko.ai/v1/ui
 |-------|---------------|
 | **Getting Started** | First-run checklist, MCP connector URL, one-click add of the onboarding repo |
 | **Collections** | Add and remove git repos and Google Drive folders; check sync status |
-| **Pods** | Group collections into workspaces; manage nodes (CI, Runner); rotate keys |
+| **Pods** | Group collections and nodes into shared agent environments; manage capabilities and rotate keys |
 | **Credentials** | Git PATs, Google Drive connection, SSH keys for Runner nodes |
 | **Storage** | Workspace-wide artifact count, content size, and estimated context cost |
 | **Usage** | Operations, tokens, and response time over 24h / 7d / 30d |
@@ -74,7 +74,7 @@ Each collection has a reference name — the short identifier agents use in DSL 
 
 ## Pods panel
 
-Pods are workspaces. They group collections (data) and nodes (capabilities) into a single context. Each MCP connection uses exactly one pod, so switching pods is how you switch your agent between projects.
+Pods are shared agent environments. They group collections (data) and nodes (capabilities) into one environment for a piece of work. Each MCP connection uses exactly one pod, so switching pods changes the environment the agent is operating against.
 
 Your default pod is created automatically on first visit. Create more with **+ Create Pod**.
 

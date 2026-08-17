@@ -56,7 +56,7 @@ Once connected, your agent sees the collections and nodes your pod and role expo
 
 **Collections** are data sources — a git repo, a Drive folder, a document. Each collection has a reference name you use in commands.
 
-**Pods** are workspaces that group collections together. Your default pod is created automatically. You can create additional pods to organize different projects.
+**Pods** are shared agent environments. A pod groups the collections, nodes, roles, and working state for a piece of work. Your default pod is created automatically. You can create additional pods to organize different projects.
 
 **The DSL** is how agents interact with your content. Operations like `ls()`, `read()`, `grep()` let agents navigate without downloading entire files.
 

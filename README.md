@@ -6,9 +6,9 @@ last_validated: 2026-07-14
 
 # Lynko
 
-Connect your content once. Any connected agent can navigate your repos, docs, PDFs, and sheets through structural handles — the section, function, row, or run — not file dumps. On writable sources, authorized agents use the same surface to edit, test, and commit.
+A Lynko pod is a shared environment for agents. It combines your existing content sources, attached capabilities, role-scoped access, and persistent working state so different agents can work against the same environment.
 
-Lynko keeps shared working state addressable. Each agent assembles the context it needs from the same handles; drafts, runs, and results persist across sessions and harnesses, so the next agent resumes without rebuilding a transcript. Roles determine what an agent may do, and the server enforces those permissions on every call.
+Content stays addressable through stable structural handles — a section, function, row, file, or run — so agents can revisit the same organizational objects across steps and sessions instead of rebuilding context from file dumps. On writable sources, authorized agents use the same environment to edit, test, and commit.
 
 ## Quick Start
 
@@ -20,7 +20,9 @@ Lynko keeps shared working state addressable. Each agent assembles the context i
 
 Four things, in the order you'll meet them.
 
-**1. Handles, not file dumps.** Content-intelligent navigation — structure-aware operations that match how content is naturally organized.
+**1. One shared environment.** A pod brings collections, attached nodes, scoped roles, and persistent working state together for one piece of work. Different agents can connect to the same pod without reconstructing that environment from scratch.
+
+**2. Stable structural handles.** Content-intelligent navigation — structure-aware operations that match how content is naturally organized.
 
 Code: understand structure without reading entire files.
 
@@ -41,7 +43,7 @@ my-contracts[msa-2026.pdf].section("Indemnification")    # Jump to one clause in
 my-finance[q1-forecast.gsheet].sheets()                  # List spreadsheet tabs
 ```
 
-**2. Safe, scoped edits.** The same operation that reads content also defines the edit scope. Versioning and rollback come from git — mechanisms your team already trusts; Lynko adds the scoping, the draft workflow, and the audit trail on top.
+**3. Safe, scoped edits.** The same operation that reads content also defines the edit scope. Versioning and rollback come from git — mechanisms your team already trusts; Lynko adds the scoping, the draft workflow, and the audit trail on top.
 
 ```
 my-project[src/server.go].expand("Handler").draft.edit("old", "new")   # Scoped to one function
@@ -49,7 +51,7 @@ my-project[docs/guide.md].section("Setup").draft.edit("old", "new")    # Scoped 
 my-project.diff()                                                       # Review changes
 ```
 
-**3. The full loop.** Edit → test → commit, one grammar. A CI node runs tests against your drafts before anything lands; a runner node executes commands on your machines. Your collections are the nouns; every new node adds a verb to the same grammar.
+**4. Act and verify.** Edit → test → commit, one grammar. A CI node runs tests against your drafts before anything lands; a runner node executes commands on your machines. Your collections are the nouns; every new node adds a verb to the same grammar.
 
 ```
 my-project.test(targets="api")                  # CI runs against draft state
@@ -57,13 +59,11 @@ ci["run-20260605-..."].grep("FAIL")             # Inspect results — the run is
 my-project.commit("fix: update handler and docs")  # Publish
 ```
 
-**4. A workspace that keeps state.** Your pod is a working copy of your content universe: drafts persist across sessions, reads see draft state, and per-pod curation (like pinning your go-to skills) shapes what agents discover — without touching the underlying repos.
-
 **Smart resolution:** paths resolve automatically. `my-project[handler.go]` finds `src/internal/handler.go` if unique. `section("setup")` matches "Setup Guide". You can even skip the collection name — a bare path like `src/main.go` resolves to the right collection and runs your operation, as long as the file is unambiguous across your workspace.
 
 Filesystem operations (`ls`, `grep`, `find`) and scoped search (`my-project[src/].grep("pattern")`) work as you'd expect. See the [DSL cheatsheet](reference/dsl-cheatsheet.md) for the full reference.
 
-**Compared to a native connector:** A Drive or GitHub MCP connector moves bytes — your agent gets a snippet or a downloaded file, then has to dump it into context, build an ad-hoc parser, or guess structure from headings. Lynko exposes handles instead. The same operation that names a section, function, or row range also defines the edit scope. Bytes vs handles is the difference between "the file" and "the function you wanted to change."
+**Compared to a native connector:** A native connector gives an agent access to one source. Lynko makes connected sources part of one shared working environment with stable structural handles, scoped roles, persistent draft/run state, and attached capabilities such as CI and Runner. Native source systems remain authoritative.
 
 ## What's in This Repo
 

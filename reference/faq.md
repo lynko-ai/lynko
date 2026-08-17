@@ -9,7 +9,7 @@ last_validated: 2026-07-14
 ## General
 
 **What is Lynko?**
-Lynko is a platform that exposes your content sources (git repos, Google Drive, PDFs) to AI agents through a unified DSL. Instead of downloading files or managing format-specific tools, agents navigate your content through operations like `read()`, `grep()`, and `outline()`.
+Lynko gives agents a shared environment over your existing organizational content and attached capabilities. A pod groups the sources, roles, and working state for a piece of work; agents interact with it through a structural DSL over MCP.
 
 **What AI clients work with Lynko?**
 Any client that supports MCP (Model Context Protocol) custom connectors. This includes Claude (Desktop and web), ChatGPT, and many developer tools. See the [getting started guide](../getting-started.md) for setup instructions.
@@ -24,10 +24,10 @@ Lynko syncs content from your sources (GitHub, Google Drive) so agents can navig
 Define a scoped role on the pod (dashboard → your pod's **Roles** button): a named set of read/write/admin grants over collections and paths. Then point that agent at the role's connection URL — `https://mcp.lynko.ai/pods/<pod-id>/as/<role>` — instead of the plain pod URL. The connection carries only what the role grants: operations outside it don't appear in `artifacts()`, and attempts are rejected server-side. Verify with `whoami()`. The same roles are what `invoke()` dispatches sub-agents as.
 
 **My agent already has bash, grep, and file access. What does Lynko add?**
-Bash + grep gets you bytes. Lynko gets you *structural navigation* — the same way humans read: tables of contents, section headings, function outlines. An agent forced to rebuild these per-session (parsing PDFs with custom scripts, extracting markdown TOCs by hand, running ad-hoc AST tools) is essentially rebuilding Lynko — slowly, incompletely, and from scratch every time. Lynko ships the navigation once; every agent can use it immediately, across every content type and every source.
+A local filesystem is excellent for one colocated agent. Lynko adds the parts that matter when the work spans remote heterogeneous sources or multiple agent surfaces: stable source identity, structural handles, server-enforced roles, persistent pod drafts/runs/results, and shared access to the same environment across sessions and harnesses. Operations such as `toc()`, `section()`, `outline()`, and `rows()` also keep agents from rebuilding content-specific parsers and ad-hoc context themselves.
 
 **My agent already has a Google Drive or GitHub connector. What does Lynko add?**
-Native connectors move bytes; Lynko exposes handles. A Drive or GitHub connector returns a snippet or file; Lynko returns a live section, function, or row address the agent can revisit and cite across steps. On writable Git collections, supported structural handles also bound edits, and the same surface carries drafts through test and commit. On read-only sources, handles remain precise navigation targets.
+A native connector gives an agent access to one source. Lynko makes connected sources part of one shared working environment: stable structural handles, scoped roles, persistent draft/run state, and attached capabilities such as CI and Runner. Native source systems remain authoritative.
 
 **Why MCP, not a typed API like gRPC?**
 MCP is a text-in, text-out protocol. That matches how agents actually reason — they were trained on text and think in text. A rigid typed API would force the agent to translate between its natural mental model and a schema, wasting attention on protocol plumbing. MCP lets the agent stay in one mental mode. It's also the emerging standard — Claude, ChatGPT, Cursor, and most major AI clients support custom MCP connectors. Connect once, work everywhere.
