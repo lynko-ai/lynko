@@ -63,9 +63,21 @@ my-project[src/].grep("Handler", context_lines=2)  # All mentions in src/
 
 1. `status()` — what files changed?
 2. `diff()` — scan the overall shape of changes
-3. **Classify risk tier** (see below) — path and content signals decide depth
-4. Review each file to tier-appropriate depth
-5. Report findings grouped by tier; never mark Tier 3 as approved without human review
+3. **Architecture sanity / degrowth pass** — trace live callers before hardening abstractions
+4. **Classify risk tier** (see below) — path and content signals decide depth
+5. Review each file to tier-appropriate depth
+6. Report findings grouped by tier; never mark Tier 3 as approved without human review
+
+### Architecture sanity / degrowth pass
+
+For every meaningful changed surface, identify its production callers and adjacent wrappers before judging the patch locally.
+
+- Zero production callers → first evaluate deletion.
+- One specialized caller → first evaluate narrowing to that caller's real contract.
+- Prefer **deletion → narrowing → reuse → new abstraction** unless concrete callers require broader machinery.
+- If a fix adds validators, adapters, outcome types, helper layers, or tests, ask whether removing an obsolete capability makes that machinery unnecessary.
+- After narrowing a contract, trace upward and downward until every layer advertises the same semantic boundary.
+- "No callers", "all writers", "complete list", and similar absence/completeness statements are claims: verify with both reference tracing and a broad textual sweep.
 
 ## Risk Tiers
 

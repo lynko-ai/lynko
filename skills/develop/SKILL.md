@@ -13,11 +13,12 @@ For full syntax details, see the [DSL cheatsheet](../reference/dsl-cheatsheet.md
 ## Workflow
 
 1. **Check state** → `status()`, `log()`
-2. **Read code** → `outline()`, `expand()`, `grep()`
-3. **Edit** → `draft.edit()`, `lines().draft.replace()`
-4. **Review** → `diff()`, `status()`
-5. **Test** → `test()`, `ci["run-ID"].ls()`
-6. **Commit** → `commit()`
+2. **Read + trace** → `outline()`, `expand()`, `find_references()`, `grep()`
+3. **Minimize the design** → prove the live surface before adding or hardening abstractions
+4. **Edit** → `draft.edit()`, `lines().draft.replace()`
+5. **Review + truth sweep** → `diff()`, `status()`, references + grep-zero checks
+6. **Test** → `test()`, `ci["run-ID"].ls()`
+7. **Commit** → `commit()`
 
 Use multi-command syntax (multiple commands separated by newlines in one call) to reduce round trips.
 
@@ -40,7 +41,19 @@ my-project.find_references("UserService")    # Trace all usages
 my-project[src/].grep("handleAuth", context_lines=3)
 ```
 
-## 3. Edit
+## 3. Minimize the Design
+
+Before editing, trace the production call graph for every API/type/helper you plan to add, widen, or repair.
+
+- **Zero production callers:** prefer deletion over hardening dead surface.
+- **One specialized caller:** prefer a specialized contract; preserve generality only for concrete competing callers.
+- Before adding validation, adapters, outcomes, or tests around an awkward abstraction, ask whether deleting or narrowing it removes the defect entirely.
+- Trace the contract through adjacent wrappers/layers so a narrowed lower-level API is not still advertised generically above it.
+- Treat absence as a claim: verify "no callers" with both reference tracing and a broad textual sweep.
+
+For persistence, initialization, backfill/migration, deployment, or concurrency changes, write down the reachable states and transitions before coding. Identify the **single authority** for each durable transition and check fresh install, upgrade, retry/interruption, partial deployment, and concurrent writers where applicable. Prefer idempotent or fail-closed transitions over process-local heuristics.
+
+## 4. Edit
 
 **Content-addressed** (primary) — match and replace exact text:
 
@@ -60,7 +73,7 @@ my-project[src/server.go].lines("42").draft.replace("new content")
 my-project[src/new-file.go].draft("package main\n...")
 ```
 
-## 4. Review
+## 5. Review + Truth Sweep
 
 ```
 my-project.status()                          # Which files changed?
@@ -68,7 +81,14 @@ my-project.diff()                            # All changes summarized
 my-project[src/server.go].diff()             # One file's full diff
 ```
 
-## 5. Test
+Before testing/commit:
+
+- Re-run `find_references()` for deleted or narrowed symbols and grep retired vocabulary across the relevant tree.
+- When changing one member of a paired/enumerated contract, reread the whole set; a correct local diff can leave its sibling stale.
+- Recheck comments/docs/tests at the adjacent abstraction layers so the code and advertised contract still say the same thing.
+- For load-bearing claims such as "all writers", "sealed", "deadlock-free", or "never", identify the invariant that makes the bad state impossible; a passing example alone is not proof.
+
+## 6. Test
 
 `test()` runs against draft content — no commit needed:
 
@@ -85,7 +105,7 @@ ci["run-ID/34"].read()                       # Drill into one result
 ci["run-ID"].grep("FAIL", context_lines=3)   # Search across results
 ```
 
-## 6. Commit
+## 7. Commit
 
 ```
 my-project.diff()                            # Final review
