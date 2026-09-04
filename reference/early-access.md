@@ -59,7 +59,7 @@ If you've already been allowlisted but you're still seeing the warning page: yel
 
 Some Drive content types currently have limited navigation:
 
-- **`.docx` / `.xlsx` files** — Lynko can list them but can't currently navigate their structure (headings, sections, sheets, cells). For now they show only `read()`. Convert to Google Docs / Google Sheets in Drive if you need structural navigation. Native parsing is on the near-term roadmap.
+- **`.docx` files** — Lynko can list them but can't currently navigate their structure (headings, sections). For now they show only `read()`. Convert to Google Docs in Drive if you need structural navigation. Native parsing is on the near-term roadmap. `.xlsx` workbooks are navigated natively — `sheets()`, `rows()`, `cells()` and cell-addressed `grep()` — with no conversion needed.
 - **Image-only PDFs** (scans, exported documents without text layers) — `pages()` and `read()` work, but `grep()` is not available since there's no text to search. OCR support is on the longer-term roadmap.
 
 These limitations apply to Drive specifically. Git collections, Google Docs, Google Sheets, and PDFs with text layers all have full content-intelligent navigation.

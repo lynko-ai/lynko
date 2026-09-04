@@ -74,18 +74,28 @@ my-drive[Roadmap].grep("milestone")          # Search with section + tab context
 
 ## Reading Spreadsheets
 
-Google Sheets in Drive collections use rows as their natural unit. Start with `sheets()` for the schema, then drill into data:
+Spreadsheets use rows as their natural unit — `.xlsx` workbooks committed to a git collection and Google Sheets in Drive collections alike. Start with `sheets()` for the shape, then drill into data:
 
 ```
-my-drive[Budget].sheets()                              # Sheet names, headers, dimensions
-my-drive[Budget].rows("1-10")                          # First 10 rows (single-sheet)
-my-drive[Budget].rows("Sales:1-10")                    # Sheet-qualified rows (multi-sheet)
-my-drive[Budget].rows("Sales:1-10", columns="Revenue,Cost")  # Column projection by header name
-my-drive[Budget].cells("Sales!B5:D15")                 # A1-notation access
-my-drive[Budget].grep("Widget")                        # Search with sheet+row context
+my-project[model.xlsx].sheets()                        # Sheet order and each sheet's used range
+my-prices[list.xlsx].rows("1-10")                      # First 10 rows (single-sheet workbook)
+my-project[model.xlsx].rows("Sales!1-10")              # Sheet-qualified rows (multi-sheet)
+my-project[model.xlsx].rows("Sales!1-10", columns="B:D")  # Column projection, by letter
+my-project[model.xlsx].cells("Sales!B5:D15")           # A1-notation access
+my-project[model.xlsx].cells("Sales!B5", as="formulas")   # The stored expression
+my-drive[Budget].rows("Sales!1-10")                    # The same calls on a Google Sheet
 ```
 
-`grep()` on spreadsheets returns sheet-aware results like `Sales Row 3:` — use the same addressing with `rows()` to follow up: `rows("Sales:3")`.
+Addresses are physical coordinates: row 1 is the first worksheet row even when it holds headers, the sheet qualifier is `<sheet>!<coordinate>`, and `columns=` takes column letters (`"B:D"`, `"A,C,E:G"`) — header names are not selectors.
+
+`grep()` on a spreadsheet answers exact cell coordinates, which chain straight into `cells()`:
+
+```
+my-project[model.xlsx].grep("Widget")                  # → Sales!D37
+my-project[model.xlsx].cells("Sales!D37")              # Follow the coordinate
+```
+
+An `.xlsx` also serves `as="raw"` for stored typed values and `in="formulas"` to search expressions; a Google Sheet holds display text only and refuses those rather than passing display text off as a stored value.
 
 ## Reading Code
 

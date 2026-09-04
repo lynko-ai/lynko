@@ -1,7 +1,7 @@
 ---
 title: Lynko DSL Cheatsheet
 audience: users
-last_validated: 2026-08-13
+last_validated: 2026-09-04
 ---
 
 # Lynko DSL Cheatsheet
@@ -66,7 +66,7 @@ If a path uniquely identifies a file across all collections in the pod, you don'
 | `find(pattern)` | Find files by glob | `my-project.find(*.go)` |
 | `toc()` | Table of contents (markdown) | `my-project[README.md].toc()` |
 | `outline()` | Code structure (types, functions) | `my-project[main.go].outline()` |
-| `sheets()` | Sheet names, headers, dimensions | `my-drive[Budget].sheets()` |
+| `sheets()` | Sheet order with each sheet's used range | `my-project[model.xlsx].sheets()` |
 
 **Content types use different navigation patterns:**
 
@@ -76,7 +76,7 @@ If a path uniquely identifies a file across all collections in the pod, you don'
 | Markdown/Docs | `toc()` | `section("Heading")`, `lines("10-20")` | `read()` |
 | PDF | `toc()` | `pages("1,3-5")` | `read()` |
 | Google Docs | `toc()` | `section("Heading")`, `paragraphs("1-5")`, `tab("Tab 1")` | `read()` |
-| Google Sheets | `sheets()` | `rows("Sales:1-10")`, `cells("B5:D15")` | `read()` |
+| Spreadsheets | `sheets()` | `rows("Sales!1-10")`, `cells("Sales!B5:D15")` | `read()` |
 | Collections | `ls()`, `tree()` | `grep()`, `find()` | — |
 
 ## Reading
@@ -92,9 +92,9 @@ If a path uniquely identifies a file across all collections in the pod, you don'
 | `pages(spec)` | PDF page range | `my-project[doc.pdf].pages("1-3")` |
 | `paragraphs(spec)` | Google Doc paragraph range | `my-drive[Roadmap].paragraphs("1-5")` |
 | `tab(name)` | Google Doc tab by title (multi-tab only) | `my-drive[Roadmap].tab("Q4 Plan")` |
-| `sheets()` | Sheet names, headers, dimensions | `my-drive[Budget].sheets()` |
-| `rows(spec)` | Row range with optional column projection | `my-drive[Budget].rows("Sales:1-10")` |
-| `cells(spec)` | Cell range via A1 notation | `my-drive[Budget].cells("Sales!B5:D15")` |
+| `sheets()` | Sheet order with each sheet's used range | `my-project[model.xlsx].sheets()` |
+| `rows(spec, columns=)` | Physical row range, optional column projection | `my-project[model.xlsx].rows("Sales!1-10")` |
+| `cells(spec)` | Cell rectangle via A1 notation | `my-project[model.xlsx].cells("Sales!B5:D15")` |
 
 **Hierarchical section paths:** when sections share common titles (like "Introduction" in multiple chapters), use ` > ` to disambiguate:
 
@@ -128,16 +128,31 @@ my-drive[Roadmap].grep("milestone")          # Search with section + tab context
 
 `tab()` is advertised only on multi-tab documents. On single-tab Google Docs, `read()` returns the full document — the tab operation is hidden because it would be a no-op.
 
-**Reading Google Sheets:** Google Sheets in Drive collections use rows as their natural unit. `sheets()` shows the schema, `rows()` navigates data, `cells()` is the A1 escape hatch.
+**Reading spreadsheets:** spreadsheets use physical rows and columns as their natural unit. An `.xlsx` file and a Google Sheet answer the same operations — `sheets()` shows the structure, `rows()` navigates data, `cells()` is the A1 escape hatch.
 
 ```
-my-drive[Budget].sheets()                              # Sheet names, headers, dimensions
-my-drive[Budget].rows("1-10")                          # First 10 rows (single-sheet)
-my-drive[Budget].rows("Sales:1-10", columns="Revenue,Cost")  # Sheet-qualified + column projection
-my-drive[Budget].cells("Sales!B5:D15")                 # A1-notation access
+my-project[model.xlsx].sheets()                           # Sheet order and used ranges
+my-project[prices.xlsx].rows("1-10")                      # First 10 rows (single-sheet workbook)
+my-project[model.xlsx].rows("Sales!20-40", columns="F:H") # Sheet-qualified + column projection
+my-project[model.xlsx].cells("Sales!B5:D15")              # A1-notation access
+my-drive[Budget].rows("Sales!20-40")                      # The same calls on a Google Sheet
 ```
 
-Multi-sheet spreadsheets require sheet qualification for `rows()` and `cells()`. Single-sheet spreadsheets work without it. `columns=` accepts header names (`"Revenue,Cost"`) or letter ranges (`"A:D"`).
+Sheet qualification is `<sheet>!<coordinate>`, for `rows()` and `cells()` alike. Multi-sheet workbooks require it — Lynko never silently picks the first sheet — and single-sheet workbooks may omit it. A title carrying spaces or delimiters accepts spreadsheet-style single quotes, and a title containing `!` requires them: `rows("'Revenue Model'!20-40")`.
+
+Addresses are physical coordinates. Row 1 is the first worksheet row even when it holds headers, and `columns=` accepts column letters only — `"F:H"` or `"A,C,E:G"`. Header names are not selectors.
+
+**Representation planes.** Reads show displayed values by default. Where a provider stores more than the displayed text, `as=` selects another plane, on `read()`, `rows()` and `cells()` alike:
+
+| Call | What it shows |
+|------|---------------|
+| `cells("Sales!B5:D15")` | displayed values |
+| `cells("Model!B20:D21", as="formulas")` | formula expressions, with literal cells shown as their values |
+| `cells("Model!B20:D21", as="raw")` | stored typed scalars, unformatted |
+
+`.xlsx` workbooks serve both extra planes. A Google Sheet holds display text only, so it advertises neither and refuses a direct request rather than passing display text off as a stored value. Lynko does not evaluate formulas: a workbook whose stored calculation state asks to be recalculated says so on the response's scope or header line.
+
+`.xlsx` is the native workbook format. `.xls`, `.xlsm` and `.xlsb` are not read as spreadsheets.
 
 ## Searching
 
@@ -149,6 +164,16 @@ Multi-sheet spreadsheets require sheet qualification for `rows()` and `cells()`.
 | `search(query)` | Semantic search — ranked by meaning, not exact text | `my-project.search("how auth tokens are refreshed")` |
 | `find_definition(symbol)` | Find where defined | `my-project.find_definition("UserService")` |
 | `find_references(symbol)` | Find all usages | `my-project.find_references("UserService")` |
+
+**Searching spreadsheets:** `grep()` on a workbook matches cells, and every result is a canonical cell coordinate that chains straight into `cells()`. Collection-level `grep()` searches workbooks alongside text files, in git and Drive collections alike.
+
+```
+my-project[model.xlsx].grep("Widget")             # Sales!D37   Widget
+my-project[model.xlsx].grep("P65", in="formulas") # Search expressions instead of values
+my-project.grep("Widget")                         # Collection sweep — workbooks answer cells
+```
+
+On a file, `in="formulas"` is offered only where the provider stores expressions, and spreadsheet `grep()` takes `max_results` but not `context_lines`: the coordinate is the whole result, and a neighbourhood is read with `rows()` or `cells()`. A collection sweep searches displayed values — `in=` is a file-level selector.
 
 **Scope narrowing:**
 

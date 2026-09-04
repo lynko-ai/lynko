@@ -23,9 +23,9 @@ Snapshots: navigation only.
 | Markdown / structured text | `toc()` · `section()` · `lines()` | — |
 | PDF | `pages()` · `toc()` / `section()` · `grep()` | `toc()`/`section()` need native bookmarks; `grep()` needs extractable text |
 | Google Docs | `toc()` · `section()` · `paragraphs()` · `tab()` | `tab()` for multi-tab documents |
-| Google Sheets | `sheets()` · `rows()` · `cells()` · `grep()` | — |
+| Spreadsheets | `sheets()` · `rows()` · `cells()` · `grep()` | native `.xlsx` in git or Drive collections (not `.xls`, `.xlsm` or `.xlsb`); Google Sheets in Drive. `as="raw"` / `as="formulas"` / `grep(in="formulas")` need a provider that stores those planes — `.xlsx` does, Google Sheets does not |
 
-Collections expose `ls()`, `find()`, and — when hierarchical — `tree()`. Files expose `read()` plus their type-specific operations. `grep()` works where text is extractable or materialized. PDF is navigate-only today, regardless of the containing collection.
+Collections expose `ls()`, `find()`, and — when hierarchical — `tree()`. Files expose `read()` plus their type-specific operations. `grep()` works where text is extractable or materialized; on a spreadsheet it matches cells and answers coordinates. PDF and spreadsheet content is read-only today — no page or cell mutation — regardless of the containing collection.
 
 ## Optional nodes
 
