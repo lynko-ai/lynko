@@ -169,11 +169,14 @@ Addresses are physical coordinates. Row 1 is the first worksheet row even when i
 
 ```
 my-project[model.xlsx].grep("Widget")             # Sales!D37   Widget
-my-project[model.xlsx].grep("P65", in="formulas") # Search expressions instead of values
+my-project[model.xlsx].grep("P65", as="formulas") # Search the formula representation
+my-project[model.xlsx].grep("45306", as="raw")    # Search stored typed values
 my-project.grep("Widget")                         # Collection sweep — workbooks answer cells
 ```
 
-On a file, `in="formulas"` is offered only where the provider stores expressions, and spreadsheet `grep()` takes `max_results` but not `context_lines`: the coordinate is the whole result, and a neighbourhood is read with `rows()` or `cells()`. A collection sweep searches displayed values — `in=` is a file-level selector.
+`grep()` searches the representation `read()` renders, named the same way: whatever is visible at a cell under `read(as=R)` is findable with `grep(text, as=R)`. Under `as="formulas"` that includes literal cells — they render their own values there, so a workbook's formula representation is the whole grid, not just its expressions.
+
+`as="formulas"` and `as="raw"` are offered only where the provider stores those representations. Where a cell cannot be stated in the one you asked for — a shared-formula follower carries no expression of its own — it is excluded from the search and counted beside the total, so a workbook never answers a bare "no matches" when something went unsearched. Spreadsheet `grep()` takes `max_results` but not `context_lines`: the coordinate is the whole result, and a neighbourhood is read with `rows()` or `cells()`. A collection sweep searches displayed values; `as=` is a file-level selector.
 
 **Scope narrowing:**
 

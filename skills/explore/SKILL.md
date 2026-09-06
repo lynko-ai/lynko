@@ -95,7 +95,7 @@ my-project[model.xlsx].grep("Widget")                  # → Sales!D37
 my-project[model.xlsx].cells("Sales!D37")              # Follow the coordinate
 ```
 
-An `.xlsx` also serves `as="raw"` for stored typed values and `in="formulas"` to search expressions; a Google Sheet holds display text only and refuses those rather than passing display text off as a stored value.
+An `.xlsx` also serves `as="raw"` for stored typed values and `as="formulas"` for expressions — the same selector on `read()` and on `grep()`, so anything you can see in a representation you can search in it; a Google Sheet holds display text only and refuses those rather than passing display text off as a stored value.
 
 ## Reading Code
 
