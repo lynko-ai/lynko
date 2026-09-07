@@ -1,7 +1,7 @@
 ---
 title: Lynko DSL Cheatsheet
 audience: users
-last_validated: 2026-09-04
+last_validated: 2026-09-07
 ---
 
 # Lynko DSL Cheatsheet
@@ -113,7 +113,7 @@ Intermediate levels can be skipped — `section("Neural Networks > Estimation Er
 | `pages("2", as="image")` | Multi-column tables, financial statements, charts; text shows glyph drops |
 | `pages("2", as="text")` | Forcing text on an image-only page (errors if unavailable) |
 
-`toc()` and `section()` work on PDFs with bookmarks. `grep()` searches extracted text from text pages; for image-only PDFs, `grep()` is hidden and `pages()` renders page images. Image mode runs ~2–4× the input-token cost of text at 150 DPI — use as a precision step, not the default.
+`toc()` and `section()` work on PDFs with bookmarks. `grep()` is always callable and searches whatever native text was extracted; it does not run implicit OCR, so an image-only PDF can honestly return zero matches while `pages()` remains the route to rendered page images. Image mode runs ~2–4× the input-token cost of text at 150 DPI — use as a precision step, not the default.
 
 **Reading Google Docs:** Google Docs in Drive collections use paragraphs as their natural unit, with headings forming a hierarchical table of contents. Multi-tab documents expose each tab as a navigable unit.
 
