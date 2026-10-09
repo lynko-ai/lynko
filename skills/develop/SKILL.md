@@ -112,7 +112,17 @@ my-project.diff()                            # Final review
 my-project.commit("feat(auth): add token refresh")
 ```
 
-`commit()` pushes as part of the call. If it errors but `log()` shows your commit, the push half failed (remote-side): do not re-commit — reads will serve pre-commit content and a re-commit of the same paths is refused as base-conflicted, while `pull()` won't help (origin is behind, not ahead). Run `push()` to complete it.
+To commit part of what is staged — your own files while a colleague's edits stay pending — select it. The bracket is an exact path. A `diff()` with the same bracket uses the same literal selection grammar; the commit freezes the rows pending when it runs, which may differ from the earlier preview, and a mode-only change shows as `No changes` in `diff()` though its mode lands:
+
+```
+my-project["src/auth/"].diff()                               # Preview the selection
+my-project["src/auth/"].commit("feat(auth): add token refresh")
+my-project.commit("fix: guide and handler", paths=["docs/guide.md", "src/handler.go"])
+```
+
+Unselected changes stay staged, untouched. The answer counts what landed, what was already satisfied and what is left pending.
+
+`commit()` pushes as part of the call. If it errors, follow the recovery its answer gives: a commit visible in `log()` does not by itself mean the push failed, and a re-commit of the same paths can be refused as base-conflicted. Use `push()` only after confirming that an intended unpublished commit remains to publish.
 
 ## Merging Branches
 
@@ -137,5 +147,6 @@ This is not a pull request — it directly merges and creates drafts. You still 
 
 ```
 my-project[src/server.go].draft.discard()    # Discard one file
+my-project["src/auth/"].restore()             # Discard one path's staged changes
 my-project.restore()                         # Discard all drafts
 ```

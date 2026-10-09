@@ -1,7 +1,7 @@
 ---
 title: Lynko DSL Cheatsheet
 audience: users
-last_validated: 2026-09-07
+last_validated: 2026-10-09
 ---
 
 # Lynko DSL Cheatsheet
@@ -27,35 +27,43 @@ collection.operation()                       # Collection-level operation
 - Quotes optional for simple values: `ls(src/)` or `ls("src/")`
 - Quotes required for spaces, commas, equals: `grep("hello world")`
 - Named args: `grep("pattern", context_lines=3)`
-- Raw strings for multi-line: delimit with `@@@@@` on own lines
+- Raw strings for multi-line: delimit with `@@@@@` (see [Editing](#editing))
+- Lists: flat lists of scalars where an operation takes a list, such as `paths=["README.md", "src/"]`; `commit`'s `paths` takes strings only
+- Use the documented arguments and give each once: a named key given twice is a parse error, and an argument the operation does not take is refused (a few compatibility exceptions remain — `whoami()` ignores its arguments)
 
 ## Path Resolution
 
-**Bracket notation** resolves in this order:
+**What a bracket means depends on the operation.**
 
-1. Contains `*` → **glob scope** (`my-project[**/*.go].grep("TODO")`)
-2. Ends with `/` → **directory scope** (`my-project[src/].grep("TODO")`)
-3. Exact file match → **file reference** (`my-project[src/main.go].read()`)
-4. Prefix matches a directory → **directory scope** (`my-project[src].grep("TODO")` — trailing slash optional)
-5. None of the above → **partial match** across all files
-
-**Partial path matching** (Single Match Resolution):
+**Content navigation** (`read`, `toc`, `section`, `outline`, `lines`, …) on an explicit bracket resolves the exact path first, then a unique case-insensitive partial match on the server:
 
 ```
-my-project[handler.go].read()               # Resolves to src/internal/handler.go
+my-project[handler.go].read()               # Resolves to src/internal/handler.go if unique
 my-project[0001].read()                      # Resolves if only one file contains "0001"
 my-drive["PromissoryNote"].read()            # Resolves to full Drive path
 ```
 
-Matching is case-insensitive. If multiple files match, you'll get suggestions. Section names resolve the same way: `section("setup")` matches "Setup Guide" if it's the only match.
+If several files match, you'll get suggestions. Section names resolve the same way: `section("setup")` matches "Setup Guide" if it's the only match.
 
-**Auto-resolve across collections:**
+**Scope-shaped calls** (`grep`, `find`, `search`, `ls`, code navigation) classify the bracket by its spelling: a bracket spelling the collection's own name is the whole collection (outside the draft family on a git collection); otherwise a trailing `/` makes a directory (`my-project[src/]`), then a `*` makes a glob (`my-project[**/*.go]`), then a last segment with an extension makes a file, and anything else is a directory (`my-project[src]`). A literal `grep` scope can still resolve partially; `find` matches its directory prefix and its glob pattern case-sensitively.
+
+**The draft family is exact.** For `status`, `diff`, `restore` and `commit`, the bracket is an exact, case-sensitive, collection-relative path, with no partial or suffix matching:
 
 ```
-`src/main.go`.outline()                      # Resolves to the right collection automatically
+my-project["docs/"].diff()                   # docs/ selects the subtree only
+my-project["docs"].diff()                    # the exact staged path docs if there is one, else the subtree
+my-project["docs/"].commit("docs: guide")    # commits the rows then selected under docs/
+my-project.commit("fix", paths=["src/a.go", "docs/"])   # several paths, one commit
+my-project["."].status()                     # ., ./ and / mean the whole collection
 ```
 
-If a path uniquely identifies a file across all collections in the pod, you don't need to specify the collection name. If ambiguous, you'll get an error showing which collections matched.
+- A bracket classified as a glob, such as `["*.md"]`, is refused. Selection never expands a glob: `paths=["*.md"]` is a literal member, and a trailing-slash bracket such as `["*.md/"]` is a literal subtree selector. An empty bracket (`my-project[""]`) is a parse error.
+- A miss on `status` or `diff` answers `No staged changes under '<scope>'` when the scope names something staged or committed, and `Nothing matches '<scope>'`, with a `Try:` for the unscoped call, when it names nothing. `restore` does nothing; `commit` refuses.
+- The bracket is the only scope: `status("docs")` and `diff(path="docs")` are refused. `commit` takes one bracket or `paths=[...]`, never both, and never `path=`.
+
+**`find` and code navigation take their path scope from the bracket alone:** `my-project["src/"].find_definition("Handler")`. A named argument the operation does not declare, such as `scope=`, is refused with the supported arguments listed.
+
+**Name the collection.** A bare path such as `` `src/main.go`.outline() `` is refused; use the bracket form, `my-project[src/main.go].outline()`.
 
 ## Navigation
 
@@ -198,7 +206,7 @@ my-project[docs/**/*.md].search("auth flow") # Semantic search, scoped
 | `find_definition` | ✓ | — (use dir scope) |
 | `find_references` | ✓ | — (use dir scope) |
 
-Scope provides defaults — explicit arguments override. For example, `my-project[docs/].ls("adr")` lists `adr/`, not `docs/adr/`.
+An explicit declared `path` overrides the bracket for `ls`, `tree` and `compare` — `my-project[docs/].ls("adr")` lists `adr/`, not `docs/adr/` — and an explicit `find` pattern overrides a glob bracket's pattern. The path scope of `grep`, `find`, code navigation and the draft family comes from the bracket alone.
 
 `search()` is on by default and builds its index on first use — a fresh collection may answer "building" once; retry in a moment. Tune with `max_results` and `vector_min_score` (a 0–1 similarity floor).
 
@@ -209,6 +217,7 @@ Scope provides defaults — explicit arguments override. For example, `my-projec
 | `draft.edit(old, new)` | Know *what* to change | `draft.edit("old text", "new text")` |
 | `draft.edit(old, new, all=true)` | Replace *all* occurrences | `draft.edit("TODO", "DONE", all=true)` |
 | `lines(N).draft.replace(new)` | Know *where* to change | `lines("42").draft.replace("new content")` |
+| `cells(range).draft.replace(new)` | Replace a cell rectangle in a writable `.xlsx` | `my-project[model.xlsx].cells("Model!B20:D20").draft.replace("1\t2\t3")` |
 | `draft.append(content)` | Add to end of file | `draft.append("\n\n## New Section")` |
 | `draft(content)` | Create new file | `my-project[new.md].draft("# Title")` |
 | `mv(destination)` | Rename/move file | `my-project[old.go].mv("new.go")` |
@@ -225,13 +234,14 @@ my-project[file.go].lines("10-20").draft.edit("old", "new")
 **Which operations support edit scoping:**
 
 - ✅ `section()`, `expand()`, `lines()` — continuous source regions
+- ✅ `cells()` — a cell rectangle of a writable `.xlsx`, for `replace` only
 - ❌ `toc()`, `outline()`, `grep()` — derived views, not editable scopes
 
-`replace()` is lines-only — `section().draft.replace()` and `expand().draft.replace()` are not supported.
+`replace()` supports `lines()` and writable `.xlsx` `cells()` scopes; `section().draft.replace()` and `expand().draft.replace()` are refused, and so is `cells().draft.edit()`.
 
 **No recursive scoping:** `section(...).lines(...).draft.edit(...)` is not supported. Use one scope level per edit.
 
-**Batched edits:** consecutive `draft.edit()` or `draft.replace()` calls on the same file in one multi-command call auto-batch with snapshot semantics — all line numbers resolve against the original content.
+**Batched edits:** consecutive `draft.edit()` calls, or consecutive `draft.replace()` calls, on the same receiver — spelled the same way — in one multi-command call auto-batch with snapshot semantics: all line numbers resolve against the original content, and all of them land or none does. A replacement batch uses one selector family, `lines()` or `cells()`; mixing them is refused.
 
 **Raw strings** (no escaping needed for multi-line):
 
@@ -251,9 +261,9 @@ func new() {
 )
 ```
 
-Opening and closing `@@@@@` must each be on their own line. The comma between arguments also goes on its own line.
+The opener must be followed by a newline, and the closer starts its own line. The argument comma or closing parenthesis may follow the closer on that line, so putting them on separate lines is optional.
 
-**Delimiter collision:** If your content itself contains `@@@@@`, use an alternative delimiter. Available delimiters are `@@@@@`, `@@@`, `"""`, and `'''`. Pick whichever one does not appear in your content. Example — editing a file that documents the `@@@@@` syntax:
+**Delimiter collision:** If your content itself contains `@@@@@`, use another delimiter: any matching run of at least three `@`, double quotes or single quotes works — `@@@@@`, `@@@`, `"""` and `'''` among them. Pick one that does not appear in your content. Example — editing a file that documents the `@@@@@` syntax:
 
 ```
 my-project[docs/dsl-guide.md].draft.edit(
@@ -273,8 +283,10 @@ new content that mentions @@@@@ delimiters
 |-----------|-------------|---------|
 | `status()` | Show pending drafts | `my-project.status()` |
 | `diff()` | Show all changes | `my-project.diff()` |
-| `commit(message)` | Commit and push | `my-project.commit("feat: add auth")` |
-| `push()` | Rescue only: complete a commit whose push half failed | `my-project.push()` |
+| `commit(message)` | Commit every staged change and push | `my-project.commit("feat: add auth")` |
+| `[path].commit(message)` | Commit one path's staged changes; the rest stay staged | `my-project["docs/"].commit("docs: guide")` |
+| `commit(message, paths=[...])` | Commit several paths as one commit | `my-project.commit("fix", paths=["src/a.go", "docs/"])` |
+| `push()` | Publish a local commit that is still unpublished (rare; see below) | `my-project.push()` |
 | `log(max?)` | Commit history | `my-project.log(max=20)` |
 | `log(commit=hash)` | One commit's full message | `my-project.log(commit="abc1234")` |
 | `compare(base)` | Stat summary vs branch | `my-project.compare(base=main)` |
@@ -282,9 +294,12 @@ new content that mentions @@@@@ delimiters
 | `pull()` | Pull latest changes | `my-project.pull()` |
 | `merge(branch)` | Merge branch into current | `my-project.merge("main")` |
 | `restore()` | Discard all drafts | `my-project.restore()` |
+| `[path].restore()` | Discard one path's staged changes | `my-project["docs/"].restore()` |
 | `draft.discard()` | Discard one file's draft | `my-project[file.go].draft.discard()` |
 
-**`push()` is a rescue, not a step.** `commit()` already pushes. If a `commit()` call errors but `log()` shows the commit, the commit landed and its push half failed (a remote-side failure): reads then serve pre-commit content for the affected paths, a later `commit()` touching them is refused with "path(s) changed on the branch since your draft was authored", and `pull()` is a no-op because origin is behind, not ahead. Confirm with `log()` and `compare(base=<origin tip>)`, then run `push()`.
+**Commit output counts what happened:** `Committed 3 changes (ec0bce4) → pushed to origin/main — 0 already satisfied, 1 left pending`. A selected change already equal to HEAD is consumed as already satisfied, and a commit that lands nothing answers `No change — 1 already satisfied, 1 left pending`. `status`, `diff` and `restore` resolve the same bracket by the same selection grammar, so a preview selects the rows a commit with that bracket would take; the commit takes the rows pending when it runs. A preview may omit a selected row HEAD already satisfies, and `diff` currently renders a mode-only change as `No changes` although its mode lands. A selection is refused while a merge is in progress: commit the whole merge, or `restore()` to abandon it.
+
+**`push()` is not a step.** `commit()` already pushes. If a `commit()` errors, follow the recovery its answer gives: a commit visible in `log()` does not by itself mean the push failed. A proven rejected push can revert the local commit; an unproven push outcome keeps a fence for reconciliation; a failure after a successful push says the changes were already pushed and directs reconciliation. Use `push()` only after confirming that an intended unpublished commit remains to publish — it does not repair the catalog or consume drafts.
 
 ## Testing
 
@@ -301,13 +316,13 @@ ci.history()                                 # List recent runs with status
 ci.status()                                  # Testable collections + active runs
 ci["run-ID"].ls()                            # List results (passed/failed/skipped)
 ci["run-ID/34"].read()                       # Read specific result by index
-ci["run-ID"].read(result_index="test-unit: my-component")  # Read by name
+ci["run-ID/test-unit: my-component"].read()  # Read by exact result name
 ci["run-ID"].grep("FAIL", context_lines=3)   # Search across all results
 ```
 
 ## Running Commands
 
-`run()` dispatches a command to a target machine via an attached runner node. Requires a runner node and at least one machine configured on your pod. Unlike `test()`, it runs against the current git state and doesn't need to be scoped to a CI build.
+`run()` dispatches a command to a target machine via an attached runner node. Requires a runner node and at least one machine configured on your pod. It runs an arbitrary command rather than a CI target: with pending drafts it runs against a checkpoint of them pushed to a system branch, and without drafts the target fetches the tracked branch (see Tips).
 
 ```
 my-project.run("cd .. && ls")                # Dispatch a command; returns a run ID
@@ -405,9 +420,9 @@ my-project.invoke("codex", "reviewer", "Summarize what changed and call out anyt
 | `agent` | The driver to launch: `codex` or `claude-code`. |
 | `as` | A **concrete role** the sub-agent runs as (e.g. `reviewer`) — see [Connection Roles](#connection-roles). Its authority is attenuated to a subset of yours — never the full / `author` role. |
 | `prompt` | The instruction handed to the sub-agent. |
-| `timeout` | Optional. Go duration (`"30s"`, `"10m"`, `"1h"`); the sub-agent is run-bounded and capped at 1h. |
+| `timeout` | Optional. Numeric seconds or a simple duration string with an optional `s`, `m` or `h` suffix (`600`, `"10m"`). The gateway accepts 1 second to 24 hours; the run is shortened to fit your delegated access, less a 30-second margin, and that credential cap defaults to one hour. |
 
-Positionals bind in order (`agent`, `as`, `prompt`, `timeout`); named args must come after any positionals — `invoke("codex", "reviewer", "…", timeout="30m")` or fully named `invoke(agent="codex", as="reviewer", prompt="…")`. A named arg before a positional mis-binds. For multi-line prompts, pass a `@@@@@` raw string.
+Positionals bind in order to `agent`, `as`, `prompt` and `timeout`, and named arguments may be interleaved with them — `invoke("codex", "reviewer", "…", timeout="30m")`, `invoke("codex", as="reviewer", prompt="…")`, or fully named. Named arguments do not skip positional slots, and giving a parameter both ways is refused. For multi-line prompts, pass a `@@@@@` raw string.
 
 `invoke()` returns immediately with a run ID — the invocation is a normal runner run. Observe it through the same `runner[...]` surface as `run()`:
 
@@ -426,10 +441,12 @@ The sub-agent runs **attenuated** to `as`, **non-chaining** (it cannot itself `i
 
 | Pattern | Matches | Example |
 |---------|---------|---------|
-| `*` | Any chars within one segment | `*.go` matches `main.go` (not `src/main.go`) |
+| `*` | Any chars within one segment | in a `grep` glob bracket, `*.go` matches `main.go` (not `src/main.go`) |
 | `**` | Zero or more path segments | `**/*.go` matches `main.go`, `src/main.go` |
 | `docs/*` | Direct children of docs/ | `docs/api.md` only |
 | `docs/**` | All descendants of docs/ | `docs/api.md`, `docs/v1/api.md` |
+
+`find()` prefixes a pattern that has no `/` with `**/`, so `find("*.go")` and `["*.go"].find()` search every depth.
 
 ## Multi-Command
 

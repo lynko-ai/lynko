@@ -1,7 +1,7 @@
 ---
 title: Lynko
 audience: users
-last_validated: 2026-07-14
+last_validated: 2026-10-09
 ---
 
 # Lynko
@@ -57,9 +57,10 @@ my-project.diff()                                                       # Review
 my-project.test(targets="api")                  # CI runs against draft state
 ci["run-20260605-..."].grep("FAIL")             # Inspect results — the run is a handle too
 my-project.commit("fix: update handler and docs")  # Publish
+my-project["docs/"].commit("docs: guide")       # ...or publish just one path
 ```
 
-**Smart resolution:** paths resolve automatically. `my-project[handler.go]` finds `src/internal/handler.go` if unique. `section("setup")` matches "Setup Guide". You can even skip the collection name — a bare path like `src/main.go` resolves to the right collection and runs your operation, as long as the file is unambiguous across your workspace.
+**Smart resolution for reads, exact selection for commits:** a read resolves the path for you — `my-project[handler.go].read()` finds `src/internal/handler.go` if unique, and `section("setup")` matches "Setup Guide". The draft family — `status`, `diff`, `restore` and `commit` — is exact instead: its bracket is a literal, case-sensitive path, so `my-project["docs/"].commit("docs: guide")` takes the rows the same bracket's `diff()` selects — those pending when it runs — and every other staged change stays staged. See [Path Resolution](reference/dsl-cheatsheet.md#path-resolution).
 
 Filesystem operations (`ls`, `grep`, `find`) and scoped search (`my-project[src/].grep("pattern")`) work as you'd expect. See the [DSL cheatsheet](reference/dsl-cheatsheet.md) for the full reference.
 
