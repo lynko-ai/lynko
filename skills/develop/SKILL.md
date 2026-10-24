@@ -112,7 +112,7 @@ my-project.diff()                            # Final review
 my-project.commit("feat(auth): add token refresh")
 ```
 
-To commit part of what is staged — your own files while a colleague's edits stay pending — select it. The bracket is an exact path. A `diff()` with the same bracket uses the same literal selection grammar; the commit freezes the rows pending when it runs, which may differ from the earlier preview, and a mode-only change shows as `No changes` in `diff()` though its mode lands:
+To commit part of what is staged — your own files while a colleague's edits stay pending — select it. The bracket is an exact path. A `diff()` with the same bracket uses the same literal selection grammar; the commit freezes the rows pending when it runs, which may differ from the earlier preview, and `diff()` shows a mode-only change as `old mode 100644` / `new mode 100755`, counted `N mode change(s)` in its summary:
 
 ```
 my-project["src/auth/"].diff()                               # Preview the selection
