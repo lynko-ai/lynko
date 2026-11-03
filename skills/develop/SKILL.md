@@ -53,6 +53,14 @@ Before editing, trace the production call graph for every API/type/helper you pl
 
 For persistence, initialization, backfill/migration, deployment, or concurrency changes, write down the reachable states and transitions before coding. Identify the **single authority** for each durable transition and check fresh install, upgrade, retry/interruption, partial deployment, and concurrent writers where applicable. Prefer idempotent or fail-closed transitions over process-local heuristics.
 
+### Non-negotiable simplicity gate
+
+**Build simple, robust, elegant, efficient code. Over-defensive programming, over-engineering, and unnecessary complexity are prohibited.** Every new abstraction, wrapper, validator, fallback, retry path, state machine, configuration switch, stored derivation, fixture, and test harness needs a concrete current requirement, reachable failure mode, real caller, or measured bound. No speculative future-proofing, duplicated enforcement at multiple layers, or machinery for impossible states. If a simpler implementation satisfies the same contracts and tests, use it and remove the excess.
+
+Prefer the smallest correct change using existing authorities and mechanisms. Keep validation at the owning boundary and tests at the enforcing layer; do not build new infrastructure to prove a claim already covered by an existing test. A reviewer-confirmed instance of unjustified complexity is a **blocking defect to simplify before commit**, not optional polish.
+
+This is **not** permission to weaken required authorization, fail-closed behavior, data preservation, transaction integrity, resource limits, or approved test/operational gates. Those have concrete purposes; implement them with the least machinery that enforces them.
+
 ## 4. Edit
 
 **Content-addressed** (primary) — match and replace exact text:

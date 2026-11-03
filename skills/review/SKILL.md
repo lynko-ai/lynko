@@ -79,6 +79,14 @@ For every meaningful changed surface, identify its production callers and adjace
 - After narrowing a contract, trace upward and downward until every layer advertises the same semantic boundary.
 - "No callers", "all writers", "complete list", and similar absence/completeness statements are claims: verify with both reference tracing and a broad textual sweep.
 
+### Mandatory simplicity rejection gate
+
+**Reject verified over-defensive code, over-engineering, and unnecessary complexity.** These are blocking quality defects even when CI is green and the implementation follows an approved plan. The required standard is **simple, robust, elegant, efficient** code.
+
+Check for speculative compatibility/fallbacks, duplicate validators or state owners, unused/generalized abstractions, extra adapters/configuration/state, excessive retry/recovery branches, redundant fixture/test infrastructure, and defensive handling of states the production contract makes unreachable. Compare against the **smallest implementation preserving the same real requirements, security guarantees, and observable behavior**.
+
+For each confirmed instance, identify the exact mechanism and caller path, explain its concrete maintenance/runtime cost, and name the simpler replacement or deletion. Verdict: **REQUEST CHANGES** (or scoped in-scope rejection), never APPROVE/APPROVE WITH NITS while it remains. Do not manufacture complexity findings from aesthetic preference or a hypothetical alternative without tracing the contract. Necessary authorization, validation, resource bounds, preservation, concurrency safety, and mandated test gates are not over-defense; review their implementation for proportionality rather than deleting the guarantee. The reviewer must not propose new layers, broad tests, or speculative guards as its own fix.
+
 ## Risk Tiers
 
 Review is not uniform. Mechanical violations route back to the agent loop cheaply; judgment-bound changes must surface to a human and never be auto-approved. Classify before reviewing.
