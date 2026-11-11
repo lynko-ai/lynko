@@ -8,7 +8,7 @@ description: >
 
 # Review with Lynko
 
-> **Dispatch a reviewer.** You can hand a review off to a sub-agent with `invoke()` — e.g. `my-project.invoke("claude-code", "reviewer", "Review the diff on this branch")`. The sub-agent runs attenuated to the `reviewer` role (no more powerful than your connection), non-chaining and run-bounded, and you read its findings through `runner["run-ID"].read()`. See the [DSL cheatsheet](../../reference/dsl-cheatsheet.md#invoking-agents). The risk tiers below still apply: a dispatched reviewer must not auto-approve Tier 3 changes.
+> **Dispatch a reviewer.** Use `my-project.invoke("claude-code", "reviewer", "Review this diff")` to run an attenuated, non-chaining review and read findings with `runner["run-ID"].read()`. Optional named-only `model` and `effort` select the run profile after deployment; see the [DSL cheatsheet](../../reference/dsl-cheatsheet.md#invoking-agents). Dispatched reviewers must not auto-approve Tier 3 changes.
 
 ## Checking Current State
 

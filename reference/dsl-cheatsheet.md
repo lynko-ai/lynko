@@ -408,21 +408,24 @@ Roles are also what `invoke()` dispatches sub-agents as — see [Invoking Agents
 
 ## Invoking Agents
 
-`invoke()` dispatches a **sub-agent** into the collection's pod — the agent-to-agent sibling of `run()` and `test()`. The chosen agent driver runs your prompt under a role you pick, scoped to be **no more powerful than your own** connection. Canonical use: have a sub-agent review your own diff.
+`invoke()` dispatches Codex or Claude through an attached Runner under a concrete role no more powerful than yours.
 
 ```
-my-project.invoke("claude-code", "reviewer", "Review the diff on this branch and flag risky changes")
-my-project.invoke("codex", "reviewer", "Summarize what changed and call out anything Tier 3", timeout="10m")
+my-project.invoke("claude-code", "reviewer", "Review this diff")
+my-project.invoke("claude-code", "reviewer", "Review this diff", model="claude-opus-5-5", effort="xhigh")
+my-project.invoke("codex", "reviewer", "Check the tests", model="gpt-6.1-sol", effort="high", timeout=1800)
 ```
 
-| Argument | What it is |
-|----------|------------|
-| `agent` | The driver to launch: `codex` or `claude-code`. |
-| `as` | A **concrete role** the sub-agent runs as (e.g. `reviewer`) — see [Connection Roles](#connection-roles). Its authority is attenuated to a subset of yours — never the full / `author` role. |
-| `prompt` | The instruction handed to the sub-agent. |
-| `timeout` | Optional. Numeric seconds or a simple duration string with an optional `s`, `m` or `h` suffix (`600`, `"10m"`). The gateway accepts 1 second to 24 hours; the run is shortened to fit your delegated access, less a 30-second margin, and that credential cap defaults to one hour. |
+| Argument | Meaning |
+|----------|---------|
+| `agent`, `as`, `prompt` | Installed driver (`codex` or `claude-code`), concrete attenuated role, and task prompt. |
+| `timeout` | Optional requested duration: default `60m`; seconds or `"30m"`; greater than 30s and at most 24h. Actual runtime is capped by credential expiry minus 30s (parent JWT source default: 15m). |
+| `model` | Optional **named-only** model ID; availability is checked by the provider CLI at launch. |
+| `effort` | Optional **named-only** effort: `low`, `medium`, `high`, `xhigh`, or `max`; provider support may vary. |
 
-Positionals bind in order to `agent`, `as`, `prompt` and `timeout`, and named arguments may be interleaved with them — `invoke("codex", "reviewer", "…", timeout="30m")`, `invoke("codex", as="reviewer", prompt="…")`, or fully named. Named arguments do not skip positional slots, and giving a parameter both ways is refused. For multi-line prompts, pass a `@@@@@` raw string.
+Defaults: Codex uses `gpt-6.1-sol` / `max`; Claude uses its account-selected model / `xhigh`. Only the first four arguments are positional (`agent, as, prompt, timeout`); duplicates are refused. Sub-agents cannot invoke further agents.
+
+**Availability:** `model` and `effort` require the updated MCP Gateway and Artifact Store. Check `artifacts()` for the deployed signature before using them.
 
 `invoke()` returns immediately with a run ID — the invocation is a normal runner run. Observe it through the same `runner[...]` surface as `run()`:
 
