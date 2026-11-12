@@ -81,7 +81,7 @@ For every meaningful changed surface, identify its production callers and adjace
 
 ### Mandatory simplicity rejection gate
 
-**Reject verified over-defensive code, over-engineering, and unnecessary complexity.** These are blocking quality defects even when CI is green and the implementation follows an approved plan. The required standard is **simple, robust, elegant, efficient** code.
+**Reject verified over-defensive code, over-engineering, and unnecessary complexity.** These are blocking quality defects even when CI is green and the implementation follows an approved plan. The required standard is **simple, robust, elegant, efficient** code. A proposed new check/gate/review layer needs a demonstrated reachable failure or high-value contract gap not already enforced; do not manufacture blockers from hypotheticals.
 
 Check for speculative compatibility/fallbacks, duplicate validators or state owners, unused/generalized abstractions, extra adapters/configuration/state, excessive retry/recovery branches, redundant fixture/test infrastructure, and defensive handling of states the production contract makes unreachable. Compare against the **smallest implementation preserving the same real requirements, security guarantees, and observable behavior**.
 
