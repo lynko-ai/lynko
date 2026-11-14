@@ -63,7 +63,7 @@ Once connected, your agent sees the collections and nodes your pod and role expo
 **Nodes** are services attached to your pod. Nodes control what operations are available on your collections:
 
 - **CI** (default) adds `test()` for running tests against your draft content.
-- **Runner** (opt-in, BYO machine) adds `run()` for executing arbitrary commands on a target machine you've connected over SSH — useful for builds, scripts, one-off inspections, or anything that needs to happen on a specific host. It also adds `invoke()` for dispatching a sub-agent (`codex` or `claude-code`) into the pod under an attenuated role.
+- **Runner** (opt-in, BYO machine) adds `run()` for executing arbitrary commands on a target machine you've connected over SSH — useful for builds, scripts, one-off inspections, or anything that needs to happen on a specific host. It also adds `invoke()` for dispatching a sub-agent (`codex`, `claude`/`claude-code`, or `opencode`) into the pod under an attenuated role. Native web search is available to these installed agents by default where their search provider is reachable; ask the agent to use it in the prompt. See [Invoking Agents](reference/dsl-cheatsheet.md#invoking-agents).
 - **Skills** (opt-in) adds the `skills` surface: every qualified `SKILL.md` across your collections becomes one searchable set — `skills.ls()`, `skills.search("...")` — that you can curate per pod by pinning go-to skills and excluding noise.
 
 An operation only appears on a collection when the backing node is attached. If you don't see `test()`, `run()`, or the `skills` surface in `artifacts()`, the node isn't attached to this pod.

@@ -408,24 +408,27 @@ Roles are also what `invoke()` dispatches sub-agents as — see [Invoking Agents
 
 ## Invoking Agents
 
-`invoke()` dispatches Codex or Claude through an attached Runner under a concrete role no more powerful than yours.
+`invoke()` dispatches Codex, Claude, or OpenCode through an attached Runner under a concrete role no more powerful than yours.
 
 ```
 my-project.invoke("claude-code", "reviewer", "Review this diff")
 my-project.invoke("claude-code", "reviewer", "Review this diff", model="claude-opus-5-5", effort="xhigh")
 my-project.invoke("codex", "reviewer", "Check the tests", model="gpt-6.1-sol", effort="high", timeout=1800)
+my-project.invoke("opencode", "reviewer", "Use native websearch to find the official Python documentation and cite the source")
 ```
 
 | Argument | Meaning |
 |----------|---------|
-| `agent`, `as`, `prompt` | Installed driver (`codex` or `claude-code`), concrete attenuated role, and task prompt. |
+| `agent`, `as`, `prompt` | Installed driver (`codex`, `claude`, or `opencode`; `claude-code` is a supported alias), concrete attenuated role, and task prompt. |
 | `timeout` | Optional requested duration: default `60m`; seconds or `"30m"`; greater than 30s and at most 24h. Actual runtime is capped by credential expiry minus 30s (parent JWT source default: 15m). |
 | `model` | Optional **named-only** model ID; availability is checked by the provider CLI at launch. |
 | `effort` | Optional **named-only** effort: `low`, `medium`, `high`, `xhigh`, or `max`; provider support may vary. |
 
-Defaults: Codex uses `gpt-6.1-sol` / `max`; Claude uses its account-selected model / `xhigh`. Only the first four arguments are positional (`agent, as, prompt, timeout`); duplicates are refused. Sub-agents cannot invoke further agents.
+Defaults: Codex uses `gpt-6.1-sol` / `max`; Claude uses its account-selected model / `xhigh`; OpenCode uses the fixed `google-vertex/gemini-4-carbon` / `high` (OpenCode supports effort `low`, `medium`, or `high`). Only the first four arguments are positional (`agent, as, prompt, timeout`); duplicates are refused. Sub-agents cannot invoke further agents.
 
-**Availability:** `model` and `effort` require the updated MCP Gateway and Artifact Store. Check `artifacts()` for the deployed signature before using them.
+**Native web search:** On a deployment with these drivers, Codex has live web search, Claude has native `WebSearch`, and OpenCode has native `websearch` (using Exa from the Runner). These tools are **available by default**, but the agent decides whether to call them; explicitly ask it to search in the task prompt when needed. There is no Lynko `web.fetch()` DSL operation: repository and artifact access still goes through delegated Lynko MCP. Claude's `WebFetch` and OpenCode's `webfetch` (arbitrary-URL fetching) remain disabled. Search queries may be sent to the agent's search provider; OpenCode's Exa searches originate from the Runner, so do not put secrets or private repository content into public-web queries.
+
+**Availability:** `model` and `effort` require the updated MCP Gateway and Artifact Store. Check `artifacts()` and `runner.status()` for the deployed signature and installed agent inventory before using them.
 
 `invoke()` returns immediately with a run ID — the invocation is a normal runner run. Observe it through the same `runner[...]` surface as `run()`:
 

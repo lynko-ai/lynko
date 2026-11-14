@@ -34,9 +34,11 @@ Collections expose `ls()`, `find()`, and — when hierarchical — `tree()`. Fil
 | Embedding | `search()` | node attached; qualifying content; index builds on first use |
 | CI | `test()` | pushable remote git collection · node attached · targets from CI config |
 | Runner | `run()` | remote git collection · node attached · machine registered¹ |
-| Runner | `invoke()` | remote git collection · node attached · agent installed · a delegable role (`author`/`full` excluded; sub-agent scope ⊆ yours)¹ |
+| Runner | `invoke()` | remote git collection · node attached · installed `codex`, `claude`/`claude-code`, or `opencode` driver · a delegable role (`author`/`full` excluded; sub-agent scope ⊆ yours)¹ |
 | Skills | `skills.search()` · read · pin · curate | node attached; qualified committed `SKILL.md` files |
 
 ¹ Read-only remotes: no-draft fast path; drafts without push access are rejected at dispatch.
+
+Invoked agents can use **native web search by default**, subject to their installed CLI and provider connectivity: Codex live search, Claude `WebSearch`, and OpenCode `websearch` through Runner-local Exa. The agent chooses when to search unless prompted; there is no Lynko web-fetch DSL method. Native Claude `WebFetch` and OpenCode `webfetch` remain disabled. Search queries leave Lynko's delegated repository/artifact boundary and may reach an external provider; avoid sending private content or credentials in queries.
 
 Collections and content are the nouns; nodes add the verbs — and every verb acts at the scope the handle names.
