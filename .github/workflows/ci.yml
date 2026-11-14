@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: 'CI target (ci-core or all)'
+        required: false
+        default: ci-core
+
+permissions:
+  contents: read
+
+jobs:
+  ci-core:
+    runs-on: ubuntu-latest
+    env:
+      TARGETS: ${{ github.event.inputs.targets || 'ci-core' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate requested target
+        run: |
+          case "$TARGETS" in
+            ci-core|all) ;;
+            *) echo "::error::Unsupported CI target: $TARGETS"; exit 1 ;;
+          esac
+
+      - name: Validate Markdown and workflow formatting
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          paths = sorted(p for p in Path('.').rglob('*')
+                         if p.is_file() and '.git' not in p.parts
+                         and p.suffix in {'.md', '.yml', '.yaml'})
+          errors = []
+          for path in paths:
+              lines = path.read_text(encoding='utf-8').splitlines()
+              if path.suffix == '.md' and (not lines or
+                    not (lines[0].startswith('# ') or lines[0] == '---')):
+                  errors.append(f'{path}: missing Markdown heading or front matter')
+              for line_number, line in enumerate(lines, 1):
+                  if line.endswith((' ', '\t')):
+                      errors.append(f'{path}:{line_number}: trailing whitespace')
+          if errors:
+              print('\n'.join(errors))
+              raise SystemExit(1)
+          print(f'Validated {len(paths)} Markdown and YAML files')
+          PY
