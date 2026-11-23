@@ -430,7 +430,7 @@ Defaults: Codex uses `gpt-6.1-sol` / `max`; Claude uses its account-selected mod
 
 **Availability:** `model` and `effort` require the updated MCP Gateway and Artifact Store. Check `artifacts()` and `runner.status()` for the deployed signature and installed agent inventory before using them.
 
-`invoke()` returns immediately with a run ID — the invocation is a normal runner run. Observe it through the same `runner[...]` surface as `run()`:
+`invoke()` returns immediately with a run ID — the invocation is a normal runner run. It uses the same per-pod working-copy slots, waiting behavior and 16-nonterminal-run admission limit as `run()`; it does not require an otherwise idle machine. Observe it through the same `runner[...]` surface as `run()`:
 
 ```
 runner.status()                              # Active runs + installed_agents (which drivers are available)
