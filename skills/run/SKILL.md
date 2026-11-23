@@ -80,6 +80,19 @@ my-project.run("./deploy.sh", machine="prod")
 my-project.run("./bench.sh", machine="perf-box", timeout="30m")
 ```
 
+## Working-Copy Slots and Selection
+
+A run of one collection on a machine reserves one working copy (slot) within its pod. A new slot may need a cold clone; a previously prepared slot is reused warm when safe. Other pods have independent slots even when they reference the same Git collection on the same machine.
+
+When several working copies have been prepared, `run.status()` lists the available slots, while an unqualified `run.capture()` refuses ambiguity rather than guessing. Select the copy by the **run ID that last prepared it**:
+
+```
+my-project.run.status(machine="dev", run="run_0123456789abcdef0123456789abcdef")
+my-project.run.capture(machine="dev", run="run_0123456789abcdef0123456789abcdef", include_untracked=true)
+```
+
+Use the actual run ID returned by `run()`, not the illustrative value above. Capture is refused when a command is active in that selected slot; a command in a different slot does not block it. A superseded run ID cannot select a newer preparation.
+
 ## Cancelling
 
 ```
@@ -118,7 +131,7 @@ my-project.commit("feat(handler): ...")
 
 ## Tips
 
-- Concurrent runs: one command per machine at a time. Dispatching a second run while the first is active returns a `RunInProgress` error with the active run ID — check or cancel it first.
+- Concurrent collection runs: each pod has independent working-copy slots per `(collection, machine)` (default 4; owner-configurable 1–4). Several runs can execute at once in separate slots; when all slots are busy, later runs wait for a slot and may eventually fail `WORKSPACE_HELD` if none becomes available. At the 16 nonterminal-run admission limit, `run()` and `invoke()` refuse with `RUN_IN_PROGRESS`. Use `runner.status()` to inspect holders and waiters.
 - Long-running commands survive client disconnects. The run continues on the machine (via tmux); `runner.history()` reports its final state and duration.
 - `runner.history()` paginates — the output includes the cursor for the next page.
 - Captured output is bounded at ~10MB (head+tail split past the limit, with a `--- OUTPUT TRUNCATED ---` marker between the halves). `read()`, `grep()`, and `lines()` all operate on the captured output; if truncation loses something you need, scope the command to produce less output or redirect to a file on the target and read it with a follow-up run.
