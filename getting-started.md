@@ -1,7 +1,7 @@
 ---
 title: Getting Started with Lynko
 audience: users
-last_validated: 2026-04-23
+last_validated: 2026-11-25
 ---
 
 # Getting Started with Lynko
@@ -63,7 +63,7 @@ Once connected, your agent sees the collections and nodes your pod and role expo
 **Nodes** are services attached to your pod. Nodes control what operations are available on your collections:
 
 - **CI** (default) adds `test()` for running tests against your draft content.
-- **Runner** (opt-in, BYO machine) adds `run()` for executing arbitrary commands on a target machine you've connected over SSH — useful for builds, scripts, one-off inspections, or anything that needs to happen on a specific host. It also adds `invoke()` for dispatching a sub-agent (`codex`, `claude`/`claude-code`, or `opencode`) into the pod under an attenuated role. Native web search is available to these installed agents by default where their search provider is reachable; ask the agent to use it in the prompt. See [Invoking Agents](reference/dsl-cheatsheet.md#invoking-agents).
+- **Runner** (opt-in, BYO machine) adds `run()` for executing arbitrary commands on a target machine you've connected over SSH — useful for builds, scripts, one-off inspections, or anything that needs to happen on a specific host. Add machines in the dashboard's [Compute panel](reference/dashboard.md#compute-panel) — each needs `git` and `tmux` 3.3a or newer ([Machine requirements](reference/dashboard.md#machine-requirements)) — and tick them on the pod's Runner page; a pod uses only its ticked machines. It also adds `invoke()` for dispatching a sub-agent (`codex`, `claude`/`claude-code`, or `opencode`) into the pod under an attenuated role. Native web search is available to these installed agents by default where their search provider is reachable; ask the agent to use it in the prompt. See [Invoking Agents](reference/dsl-cheatsheet.md#invoking-agents).
 - **Skills** (opt-in) adds the `skills` surface: every qualified `SKILL.md` across your collections becomes one searchable set — `skills.ls()`, `skills.search("...")` — that you can curate per pod by pinning go-to skills and excluding noise.
 
 An operation only appears on a collection when the backing node is attached. If you don't see `test()`, `run()`, or the `skills` surface in `artifacts()`, the node isn't attached to this pod.

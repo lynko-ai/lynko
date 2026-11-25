@@ -1,7 +1,7 @@
 ---
 title: Lynko DSL Cheatsheet
 audience: users
-last_validated: 2026-10-09
+last_validated: 2026-11-25
 ---
 
 # Lynko DSL Cheatsheet
@@ -322,20 +322,24 @@ ci["run-ID"].grep("FAIL", context_lines=3)   # Search across all results
 
 ## Running Commands
 
-`run()` dispatches a command to a target machine via an attached runner node. Requires a runner node and at least one machine configured on your pod. It runs an arbitrary command rather than a CI target: with pending drafts it runs against a checkpoint of them pushed to a system branch, and without drafts the target fetches the tracked branch (see Tips).
+`run()` dispatches a command to a target machine via an attached runner node. Requires an attached Runner and at least one machine ticked for this pod on its Runner page. Machines belong to the pod's owner, who adds them in the dashboard's [Compute panel](dashboard.md#compute-panel); each pod uses only the machines ticked for it. Each machine needs SSH access with a host key and `git` and `tmux` 3.3a or newer on its account's `PATH` ([Machine requirements](dashboard.md#machine-requirements)). It runs an arbitrary command rather than a CI target, using its exact recorded source: the tracked commit plus any current staged changes. It does not publish that source or commit or discard your drafts.
 
 ```
 my-project.run("cd .. && ls")                # Dispatch a command; returns a run ID
 my-project.run("pytest -k widget")           # Any shell command
 my-project[src/].run("go build ./...")       # Scope to a subdirectory
-my-project.run("./deploy.sh", machine="prod", timeout="10m")   # Pick a machine, set timeout (Go duration: "30s", "5m", "1h30m")
+my-project.run("./deploy.sh", machine="prod", timeout="10m")   # Pick a machine, set timeout (whole seconds: "30s", "5m", "1h30m")
 ```
+
+With one machine ticked for the pod, selection is automatic; with several, supply `machine="name"`. A machine that is not ticked for this pod is refused exactly like a name that does not exist, and no answer names a machine the pod cannot use. An explicit `run()` timeout is a Go duration of a whole number of seconds, at least `1s`, including composites such as `"1h30m"`; `"500ms"` or `"1.5s"` is refused. It is clamped to the Runner's maximum. Without one, the machine's default timeout applies (60 minutes unless the owner set another, in the narrower [machine form grammar](dashboard.md#compute-panel)); `invoke()` has separate timeout rules below.
 
 `run()` returns immediately with a run ID. Poll results with runner ops:
 
 ```
-runner.status()                              # Configured machines + active runs
+runner.status()                              # This pod's machines + active runs
+runner.status(machine="eval-a")             # Selected runs and labelled installed-agent inventory
 runner.history()                             # Recent runs + state and duration (newest first)
+runner.history(cursor="…")                  # Next page: run the call the previous page printed
 runner["run-ID"].read()                      # Full captured output
 runner["run-ID"].lines("1-50")               # Head of output (range)
 runner["run-ID"].lines("100-120")            # Specific line range
@@ -348,7 +352,10 @@ During execution, `read()` / `grep()` / `lines()` query the target machine live 
 ### Tips
 
 - Combine with the full DSL: `my-project[src/server.go].draft.edit(...)` → `my-project.test(...)` → `my-project.run("./smoke.sh")` all run against your current drafts on writable collections.
-- Two execution paths: with drafts → checkpoint to a system branch, push, target fetches checkpoint; without drafts → fast path, target fetches the tracked branch directly. Drafts on a read-only collection (no push access) are rejected with `RUNNER_ERROR_CANNOT_CHECKPOINT`.
+- With no effective staged changes, the run uses the exact tracked commit recorded for it and does not follow later advances of the remote branch. Staged source can also run when a previously pushable remote now refuses pushes, while the collection remains recorded as supporting pushes. Creating new drafts on a collection without recorded push support remains unavailable.
+- Slots: a machine's slots (1–4, default 4, set by the owner in Compute) are how many runs of one collection a pod can have on that machine at once; more wait their turn. A run that gets no slot within its bound fails `RUNNER_ERROR_WORKSPACE_HELD`, and a dispatch that finds 16 pending or running runs of the collection on the machine is refused `RUNNER_ERROR_RUN_IN_PROGRESS`. Other pods and collections have their own slots. `runner.status()` shows holders and waiters.
+- Dispatched runs retain their machine snapshots after an owner edit/delete or after the machine is unticked: `runner["run-ID"]` still reads and cancels them. Renames or coordinate changes can select a different/cold working copy; preserve authored work in affected copies first.
+- `runner.history()` prints a next-page call when more runs exist; run it as printed. Following those calls shows each run exactly once.
 - Long-running commands survive client disconnects — the run continues on the machine (via tmux). Use `runner.status()` while it is active and `runner.history()` for its final state and duration.
 
 ```
@@ -408,40 +415,41 @@ Roles are also what `invoke()` dispatches sub-agents as — see [Invoking Agents
 
 ## Invoking Agents
 
-`invoke()` dispatches Codex, Claude, or OpenCode through an attached Runner under a concrete role no more powerful than yours.
+invoke() dispatches a sub-agent through the attached Runner under a concrete same-pod role no more powerful than your connection.
 
-```
-my-project.invoke("claude-code", "reviewer", "Review this diff")
-my-project.invoke("claude-code", "reviewer", "Review this diff", model="claude-opus-5-5", effort="xhigh")
-my-project.invoke("codex", "reviewer", "Check the tests", model="gpt-6.1-sol", effort="high", timeout=1800)
-my-project.invoke("opencode", "reviewer", "Use native websearch to find the official Python documentation and cite the source")
-```
+    my-project.invoke("codex", "reviewer", "Review this diff", machine="eval-a")
+    my-project.invoke("claude", "reviewer", "Review this diff", machine="eval-a", model="claude-opus-5-5", effort="xhigh")
+    my-project.invoke("opencode", "reviewer", "Read the registered fixture", machine="eval-b", effort="high", timeout="10m")
 
 | Argument | Meaning |
 |----------|---------|
-| `agent`, `as`, `prompt` | Installed driver (`codex`, `claude`, or `opencode`; `claude-code` is a supported alias), concrete attenuated role, and task prompt. |
-| `timeout` | Optional requested duration: default `60m`; seconds or `"30m"`; greater than 30s and at most 24h. Actual runtime is capped by credential expiry minus 30s (parent JWT source default: 15m). |
-| `model` | Optional **named-only** model ID; availability is checked by the provider CLI at launch. |
-| `effort` | Optional **named-only** effort: `low`, `medium`, `high`, `xhigh`, or `max`; provider support may vary. |
+| agent | codex, claude or opencode. claude-code is an accepted alias of claude. Check installed agents for the selected machine. |
+| as | A concrete role in this pod, attenuated to a subset of the caller's pinned scope; never author/full authority. |
+| prompt | The task instruction. Use a raw string for multiline content. |
+| timeout | Requested duration, default 3600 seconds. Numeric seconds or a simple decimal string with an optional s, m or h suffix; strings are trimmed and the suffix is case-insensitive. After flooring to whole seconds, explicit values must be 31–86400. Composite Go durations such as 1h30m are not accepted here. |
+| machine | Named-only name of a machine ticked for this pod. One ticked machine is selected automatically; several require a choice. |
+| model | Named-only driver-specific model identifier. |
+| effort | Named-only driver-specific reasoning setting. |
 
-Defaults: Codex uses `gpt-6.1-sol` / `max`; Claude uses its account-selected model / `xhigh`; OpenCode uses the fixed `google-vertex/gemini-4-carbon` / `high` (OpenCode supports effort `low`, `medium`, or `high`). Only the first four arguments are positional (`agent, as, prompt, timeout`); duplicates are refused. Sub-agents cannot invoke further agents.
+All seven arguments can be named. Only agent, as, prompt and timeout bind positionally; a fifth positional or a duplicate positional/named assignment is refused. Named arguments do not skip positional slots.
 
-**Native web search:** On a deployment with these drivers, Codex has live web search, Claude has native `WebSearch`, and OpenCode has native `websearch` (using Exa from the Runner). These tools are **available by default**, but the agent decides whether to call them; explicitly ask it to search in the task prompt when needed. There is no Lynko `web.fetch()` DSL operation: repository and artifact access still goes through delegated Lynko MCP. Claude's `WebFetch` and OpenCode's `webfetch` (arbitrary-URL fetching) remain disabled. Search queries may be sent to the agent's search provider; OpenCode's Exa searches originate from the Runner, so do not put secrets or private repository content into public-web queries.
+| Driver | Default | Accepted profile |
+|--------|---------|------------------|
+| codex | gpt-6.1-sol / max | Safe model ID; low, medium, high, xhigh or max. Account/CLI model availability and compatibility are checked at execution. |
+| claude | CLI/account-selected model / xhigh | Optional safe explicit model ID; low, medium, high, xhigh or max. Account/CLI support may differ by model. |
+| opencode | google-vertex/gemini-4-carbon / high | Exactly that model; low, medium or high. Unsupported combinations are refused. |
 
-**Availability:** `model` and `effort` require the updated MCP Gateway and Artifact Store. Check `artifacts()` and `runner.status()` for the deployed signature and installed agent inventory before using them.
+Codex/Claude model IDs use at most 128 lowercase ASCII letters, digits, periods, underscores or hyphens, beginning with a letter or digit. Ultra is not an accepted effort. A requested profile, generated flag or successful exit does not establish the provider's observed model or effort.
 
-`invoke()` returns immediately with a run ID — the invocation is a normal runner run. It uses the same per-pod working-copy slots, waiting behavior and 16-nonterminal-run admission limit as `run()`; it does not require an otherwise idle machine. Observe it through the same `runner[...]` surface as `run()`:
+The gateway schedules min(requested seconds, delegated credential remaining seconds minus 30). If that credential allowance is below one second, dispatch is refused; configured Runner limits can shorten the window further. The parent JWT's source default is 15 minutes, not a deployed guarantee; actual parent/delegated lifetimes may be shorter than the request. The child credential has no refresh path, and a sub-agent cannot invoke another agent. A requested hour can therefore yield less runtime; cleanup/termination settlement is separate from the scheduled deadline.
 
-```
-runner.status()                              # Active runs + installed_agents (which drivers are available)
-runner.history()                             # Recent runs + final state and duration
-runner["run-ID"].read()                      # Full sub-agent output
-runner["run-ID"].lines("1-50")               # Head of output (range)
-runner["run-ID"].grep("FAIL", context_lines=3)   # Search the sub-agent's output
-runner["run-ID"].cancel()                    # Terminate the sub-agent
-```
+    runner.status(machine="eval-a")
+    runner.history()
+    runner["run-ID"].lines("1-50")
+    runner["run-ID"].grep("FAIL", context_lines=3)
+    runner["run-ID"].cancel()
 
-The sub-agent runs **attenuated** to `as`, **non-chaining** (it cannot itself `invoke()` another agent), and **run-bounded** (it terminates with the run). It already knows where it is: an invocation context block naming its collection and role is prepended to your prompt, so spend the prompt on the task, not orientation. Check `runner.status()` → `installed_agents` to see which drivers the pod has available before invoking.
+Invoke returns a normal Runner run ID. The invocation takes a slot like `run()`, waits its turn when the pod's slots for that collection and machine are busy, and counts toward the same 16-run limit. Unknown/ambiguous machine remedies repeat invoke on the original collection, not run of a generated driver command. **Availability:** machine, model and effort require the corresponding updated MCP Gateway/Artifact Store/Runner surface. Check artifacts() for the deployed signature before using them; this guide is not an installed-build attestation. Installed-agent discovery does not prove provider credentials, model availability or authorization.
 
 ## Glob Patterns
 

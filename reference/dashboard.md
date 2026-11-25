@@ -1,7 +1,7 @@
 ---
 title: Dashboard
 audience: users
-last_validated: 2026-04-29
+last_validated: 2026-11-25
 ---
 
 # Dashboard
@@ -16,12 +16,13 @@ Your dashboard is at [auth.lynko.ai/v1/ui/dashboard](https://auth.lynko.ai/v1/ui
 | **Collections** | Add and remove git repos and Google Drive folders; check sync status |
 | **Pods** | Group collections and nodes into shared agent environments; manage capabilities and rotate keys |
 | **Credentials** | Git PATs, Google Drive connection, SSH keys for Runner nodes |
+| **Compute** | Add, edit and delete your account's SSH machines for Runner; see which pods use each |
 | **Storage** | Workspace-wide artifact count, content size, and estimated context cost |
 | **Usage** | Operations, tokens, and response time over 24h / 7d / 30d |
 | **Roles** | Define per-connection read/write/admin scopes for a shared pod; connect at `/as/<role>` so each agent carries only the access it needs |
 | **Active Sessions** | See and revoke OAuth sessions from connected AI clients |
 
-The dashboard is a single page — every panel below corresponds to a section on it.
+The main dashboard groups the panels below; linked pages — a machine's add, edit and delete pages, a pod's Runner page and its Roles page — provide their own editors.
 
 ## Getting Started panel
 
@@ -116,19 +117,19 @@ Click **+ Add Node** to add another. The form lets you choose between four node 
 
 **Embedding** (`native:embedding`) — no extra config. Powers semantic `search()` on the pod's collections; the index builds automatically on the first search.
 
-**Runner** (`native:runner`) — adds `run()` for executing arbitrary commands on a machine you've connected over SSH. Useful for builds, smoke tests, or anything that needs to happen on a specific host. The form needs:
+**Runner** (`native:runner`) — adds `run()` and `invoke()` on your account's SSH machines (see [Compute](#compute-panel)). Choose only a **reference name**; it becomes the DSL prefix for run management, for example `runner.status()`, `runner.history()` and `runner["run-id"].lines("1-50")`. Attaching Runner ticks every machine you have at that moment for this pod; machines added later are ticked on the pod's Runner page.
 
-- **Reference name** — the DSL alias. Whatever you name it becomes the prefix for run management — `runner.status()`, `runner.history()`, `runner["run-id"].read()`, etc.
-- **Machine name** — a logical name. Agents pass it as `machine="..."` when a pod has multiple machines. Optional if there's only one.
-- **Host**, **Port** (default 22), **SSH User**
-- **SSH Credential** — pick a key you've uploaded under Credentials → SSH Keys
-- **SSH Host Key** — paste the `ssh-ed25519 AAAA…` portion. Get it with `ssh-keyscan -t ed25519 <host>` from your laptop, or `cat /etc/ssh/ssh_host_ed25519_key.pub` on the target. Hostname prefix and trailing comment, if any, should be omitted.
-- **Work Directory** — absolute path on the remote machine where collections are checked out
-- **Default Timeout** — Go duration format (`30m`, `2h`); per-run timeouts override
+The Runner row shows "M of N machines" — the machines ticked for this pod out of all of yours — and opens the pod's [Runner page](#pod-runner-page); on wide screens the row also has a **Manage** link to it. "0 of N machines" and "No machines" are warnings: the pod's agents cannot run anything yet.
 
-Runner rows in the Nodes table are expandable — click to see the configured machines (name, host, user, credential, work dir).
+Remove a node with **remove** in its row. Removing Runner detaches it from this pod only; your machines stay in Compute.
 
-Remove a node with **remove** in its row. Confirmation is shown for runners since this drops machine config.
+### Pod Runner page
+
+Open it from a pod's Runner row: pod → Runner → **Manage** (or the "M of N machines" pill). It has two panels.
+
+**Machines this pod may use** lists every machine of yours with a tick for each one this pod may use; **Save machines** saves exactly the ticked ones. The pod's agents can run only on ticked machines, and `runner.status()` lists only those. A machine that is not ticked is refused exactly like a name that does not exist, and no refusal names a machine the pod cannot use. Machines added later in Compute start unticked here. If the pod changed in another session, nothing is saved and the page shows the current ticks. Refreshing the page discards ticks you have not saved.
+
+**Activity** is a snapshot of the pod's runs, not a live view; **Refresh** reads it again. Runs are grouped by machine and collection, each group with a meter such as "■■■■ 4 of 4 slots in use · 1 waiting". A machine's slots are how many runs of one collection the pod can have on it at once; more wait their turn, and other pods have their own. After a machine's slots are lowered, slots still held above the new number are stated apart, e.g. "· 1 above current limit (slot 3)". Each row shows the run's slot, its state (Running, Launching, Stopping, Slot reserved, Waiting or Preparing source), its kind (`Run` or `invoke · <agent>`), its run id and its age ("started 12m ago", "dispatched 20s ago" or "in line 48s"). Run ids print short — `run_` and the first 8 hex characters, such as `run_6720e56d`. Hover to see the full id, and use **Copy** to copy it: the full id is what you give an agent to read, cancel or capture that run. **Recent** lists the pod's last ten finished runs with their outcome. Runs on a machine no longer ticked appear under "Former machines". The page never shows a run's command, output or error text.
 
 ### Roles
 
@@ -175,10 +176,45 @@ Connecting a second Google account replaces the first. To access folders owned b
 
 Required only if you use Runner nodes. Lists each uploaded key by name with a masked preview and the date you added it.
 
-- **Upload** — give the key a name (e.g. `gpu-server`) and paste the private key body. The name is what you select in the SSH Credential dropdown when adding a Runner node.
-- **Delete** — removes the key. Runner nodes referencing it will fail until you upload a replacement under the same name or reconfigure the runner.
+- **Upload** — give the key a name (e.g. `gpu-server`) and paste the private key body. Select that name as a machine's SSH key when adding or editing it in Compute.
+- **Delete** — removes the key. Machines referencing it cannot authenticate until you restore the appropriate key or update their credential reference.
 
 The dashboard never shows private key contents back — only the masked preview.
+
+## Compute panel
+
+Compute lists the SSH machines that `run()` and `invoke()` use. Machines belong to your account, not to a pod, and each pod uses only the machines ticked on its [Runner page](#pod-runner-page). The panel's intro says so: "A pod uses the machines ticked in its Runner. Slots are how many runs of one collection a pod can have on a machine at once; more wait their turn."
+
+Each row shows the machine's name (what agents pass as `machine="..."`) with its SSH key, its connection with the work directory beneath it, its slots, its default timeout and the pods that use it — up to two by name, each linking to that pod's Runner page, then `+N more`. A machine no pod uses shows **No pods**: it runs nothing until a pod ticks it. **Edit** and the trash icon open the machine's edit and delete pages. If your machines cannot be read, the panel says "Machines are unavailable." and offers no add, edit or delete.
+
+### Machine requirements
+
+- **SSH access with a host key.** Lynko connects with an SSH key you upload under Credentials → SSH Keys and checks the machine's public host key; it refuses a host that presents a different key.
+- **git and tmux 3.3a or newer** on the SSH account's `PATH`. The machine's add and edit pages say so under the SSH connection fields.
+- **A dedicated, unprivileged account.** Every run executes as the SSH account, so use one made for Lynko (for example `lynko-runner`): not your personal account or root, no sudo, and not in the `docker` group, which is root-equivalent. Connect a dev, test or sandbox machine, never production.
+
+### Adding and editing a machine
+
+Click **+ Add machine**:
+
+| Field | What to enter |
+|-------|---------------|
+| Name | 1–64 ASCII letters, digits, periods, underscores or hyphens, beginning with a letter or digit; unique among your machines. Agents select the machine with it: `run(..., machine="name")`. |
+| Host, Port, SSH user | The target hostname or IP, its SSH port (blank means 22) and the SSH account. |
+| SSH key | A key uploaded under Credentials → SSH Keys. The machine stores its name, never the private key. |
+| Host key | The machine's public host key, such as `ssh-ed25519 AAAA…`. Copy it from the machine over a session you already trust, e.g. `cat /etc/ssh/ssh_host_ed25519_key.pub`. |
+| Work directory | The base directory on the machine for collection working copies. |
+| Default timeout | Applies when `run()` sets none. Blank means 60 minutes; otherwise one whole number of seconds, minutes or hours of at most five digits, such as `90s`, `30m` or `2h`. No fraction or composite duration such as `1h30m` is accepted here. |
+| Slots per collection in each pod | 1–4; blank means 4. How many runs of one collection a pod can have on this machine at once; more wait their turn. |
+| PATH prepend | One absolute directory per line, at most 64 entries and 4096 bytes per entry. Blank lines are ignored and surrounding whitespace is trimmed; order is preserved. No colon, parent-directory (..) segment or control character; no tilde, environment-variable or glob expansion. |
+
+After you add a machine, Compute says "Machine *name* added. No pod can use it yet — tick it in a pod's Runner." A machine added later reaches no pod until you tick it on that pod's Runner page.
+
+The edit page names the pods that use the machine. A machine's name is part of its working copies' identity, so renaming it selects different working copies; changing host, port, SSH user, host key or work directory gives the machine a fresh working copy in each pod that uses it, and the edit page warns you before you save. Commit or capture authored work in the current copies first. A run already dispatched keeps its machine definition, including PATH, even if the machine is edited, deleted or unticked.
+
+Deleting a machine has its own page: type the machine's name to confirm. The pods that used it can no longer use it; active runs keep their saved machine definition.
+
+A form that is out of date saves nothing and shows the current definitions; reapply your edit to them. If a save cannot be confirmed, reload and check the current definitions before trying again; the page does not retry.
 
 ## Storage panel
 
